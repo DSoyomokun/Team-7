@@ -1,0 +1,17 @@
+npm start
+npm install
+npm i
+npm start
+npm start
+nmp i
+npm i
+npm start
+npm i
+npm start
+npm i
+npm start
+npm start
+npm open
+npm i
+npm start
+npm start
