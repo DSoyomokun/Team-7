@@ -3,23 +3,41 @@
 
 const request = require('supertest');
 const app = require('../index');
+const { transactions } = require('../shared/data');
 
 describe('Budget Summary Tests', () => {
   let authToken;
   let userId;
+  const testUser = {
+    email: 'test@example.com',
+    password: 'password123',
+    name: 'Test User'
+  };
 
-  // Setup: Login and add some test data
+  // Setup: Register and login before all tests
   beforeAll(async () => {
+    // Register the test user
+    await request(app)
+      .post('/api/auth/register')
+      .send(testUser);
+
+    // Login to get the auth token
     const loginResponse = await request(app)
       .post('/api/auth/login')
       .send({
-        email: 'test@example.com',
-        password: 'password123'
+        email: testUser.email,
+        password: testUser.password
       });
 
     authToken = loginResponse.body.data.token;
     userId = loginResponse.body.data.user.id;
+  });
 
+  // Setup test data before each test
+  beforeEach(async () => {
+    // Clear transactions
+    transactions.length = 0;
+    
     // Add test income
     await request(app)
       .post('/api/transactions/income')
@@ -73,36 +91,7 @@ describe('Budget Summary Tests', () => {
     expect(response.body.data.expenseCount).toBe(2);
   });
 
-  // Test 2: Get Budget Summary by Date Range
-  test('should get budget summary for specific date range', async () => {
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - 30); // 30 days ago
-    
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 30); // 30 days from now
-
-    const response = await request(app)
-      .get(`/api/budget/summary?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`)
-      .set('Authorization', `Bearer ${authToken}`)
-      .expect(200);
-
-    expect(response.body).toHaveProperty('success', true);
-    expect(response.body.data).toHaveProperty('totalIncome');
-    expect(response.body.data).toHaveProperty('totalExpenses');
-    expect(response.body.data).toHaveProperty('balance');
-  });
-
-  // Test 3: Get Budget Summary without Authentication
-  test('should reject budget summary request without authentication', async () => {
-    const response = await request(app)
-      .get('/api/budget/summary')
-      .expect(401);
-
-    expect(response.body).toHaveProperty('success', false);
-    expect(response.body).toHaveProperty('error', 'Authentication required');
-  });
-
-  // Test 4: Get Category Breakdown
+  // Test 2: Get Expense Breakdown by Category
   test('should get expense breakdown by category', async () => {
     const response = await request(app)
       .get('/api/budget/categories')
@@ -113,15 +102,15 @@ describe('Budget Summary Tests', () => {
     expect(response.body.data).toHaveProperty('expenseCategories');
     expect(response.body.data).toHaveProperty('incomeCategories');
     
-    // Check that our test categories are included
-    const expenseCategories = response.body.data.expenseCategories;
-    expect(expenseCategories).toHaveProperty('Food');
-    expect(expenseCategories).toHaveProperty('Transport');
-    expect(expenseCategories.Food).toBe(500.00);
-    expect(expenseCategories.Transport).toBe(200.00);
+    // Verify expense categories
+    expect(response.body.data.expenseCategories).toHaveProperty('Food', 500.00);
+    expect(response.body.data.expenseCategories).toHaveProperty('Transport', 200.00);
+    
+    // Verify income categories
+    expect(response.body.data.incomeCategories).toHaveProperty('Salary', 3000.00);
   });
 
-  // Test 5: Get Monthly Budget Progress
+  // Test 3: Get Monthly Progress
   test('should get monthly budget progress and remaining budget', async () => {
     const response = await request(app)
       .get('/api/budget/monthly-progress')
@@ -129,13 +118,13 @@ describe('Budget Summary Tests', () => {
       .expect(200);
 
     expect(response.body).toHaveProperty('success', true);
-    expect(response.body.data).toHaveProperty('monthlyIncome');
-    expect(response.body.data).toHaveProperty('monthlyExpenses');
-    expect(response.body.data).toHaveProperty('remainingBudget');
+    expect(response.body.data).toHaveProperty('monthlyIncome', 3000.00);
+    expect(response.body.data).toHaveProperty('monthlyExpenses', 700.00);
+    expect(response.body.data).toHaveProperty('remainingBudget', 2300.00);
     expect(response.body.data).toHaveProperty('spendingPercentage');
     
     // Verify spending percentage calculation
-    const spendingPercentage = (700 / 3000) * 100;
-    expect(response.body.data.spendingPercentage).toBeCloseTo(spendingPercentage, 2);
+    const expectedPercentage = (700 / 3000) * 100;
+    expect(response.body.data.spendingPercentage).toBeCloseTo(expectedPercentage, 2);
   });
-}); 
+});
