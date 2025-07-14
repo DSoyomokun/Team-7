@@ -5,9 +5,9 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-// Import your modules
+// Import shared data and routes
+const { users, transactions } = require('./shared/data');
 const routes = require('./routes');
-// const middlewares = require('./middlewares');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,42 +18,39 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Logging middleware
-app.use((req, res, next) => {
+const log = (req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   next();
-});
+};
 
-// Routes
+app.use(log);
+
+// Use routes
 app.use('/api', routes);
-
-// Health check endpoint
-app.get('/', (req, res) => {
-  res.json({ 
-    message: 'Team-7 Budget API Server',
-    status: 'running',
-    timestamp: new Date().toISOString()
-  });
-});
-
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Route not found' });
-});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ 
+  res.status(500).json({
+    success: false,
     error: 'Something went wrong!',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+    details: process.env.NODE_ENV === 'development' ? err.message : {}
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📱 API available at http://localhost:${PORT}/api`);
-  console.log(`🏥 Health check at http://localhost:${PORT}/api/health`);
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: 'Not found'
+  });
 });
 
-module.exports = app; 
+// Start server if not in test environment
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+module.exports = app;

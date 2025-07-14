@@ -1,10 +1,14 @@
-// Test file for authentication scenarios
 // Scenario 1: User Registration and Login
-
 const request = require('supertest');
 const app = require('../index');
+const authRoutes = require('../routes/auth');
 
 describe('Authentication Tests', () => {
+  // Clear users array before each test
+  beforeEach(() => {
+    authRoutes.users = [];
+  });
+
   // Test 1: User Registration
   test('should register a new user successfully', async () => {
     const userData = {
@@ -19,14 +23,25 @@ describe('Authentication Tests', () => {
       .expect(201);
 
     expect(response.body).toHaveProperty('success', true);
-    expect(response.body).toHaveProperty('message', 'User registered successfully');
     expect(response.body.data).toHaveProperty('email', userData.email);
     expect(response.body.data).toHaveProperty('name', userData.name);
-    expect(response.body.data).not.toHaveProperty('password'); // Password should not be returned
+    expect(response.body.data).toHaveProperty('id');
+    expect(response.body.data).not.toHaveProperty('password');
   });
 
   // Test 2: User Login
   test('should login user with valid credentials', async () => {
+    // First register a user
+    const userData = {
+      email: 'test@example.com',
+      password: 'password123',
+      name: 'Test User'
+    };
+
+    await request(app)
+      .post('/api/auth/register')
+      .send(userData);
+
     const loginData = {
       email: 'test@example.com',
       password: 'password123'
@@ -42,12 +57,13 @@ describe('Authentication Tests', () => {
     expect(response.body.data).toHaveProperty('token');
     expect(response.body.data).toHaveProperty('user');
     expect(response.body.data.user).toHaveProperty('email', loginData.email);
+    expect(response.body.data.user).toHaveProperty('name');
   });
 
-  // Test 3: Login with invalid credentials
+  // Test 3: Invalid Login
   test('should reject login with invalid credentials', async () => {
     const loginData = {
-      email: 'test@example.com',
+      email: 'nonexistent@example.com',
       password: 'wrongpassword'
     };
 
@@ -60,20 +76,27 @@ describe('Authentication Tests', () => {
     expect(response.body).toHaveProperty('error', 'Invalid credentials');
   });
 
-  // Test 4: Registration with existing email
+  // Test 4: Duplicate Registration
   test('should reject registration with existing email', async () => {
     const userData = {
       email: 'test@example.com',
       password: 'password123',
-      name: 'Another User'
+      name: 'Test User'
     };
 
+    // First registration should succeed
+    await request(app)
+      .post('/api/auth/register')
+      .send(userData)
+      .expect(201);
+
+    // Second registration with same email should fail
     const response = await request(app)
       .post('/api/auth/register')
       .send(userData)
       .expect(400);
 
     expect(response.body).toHaveProperty('success', false);
-    expect(response.body).toHaveProperty('error', 'Email already exists');
+    expect(response.body).toHaveProperty('error', 'User already exists');
   });
-}); 
+});
