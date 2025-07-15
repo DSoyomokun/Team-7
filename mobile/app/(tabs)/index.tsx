@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text } from 'react-native';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -9,7 +9,7 @@ import { ThemedView } from '@/components/ThemedView';
 export default function HomeScreen() {
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+      headerBackgroundColor={{ light: '#000000ff', dark: '#1D3D47' }}
       headerImage={
         <Image
           source={require('@/assets/images/partial-react-logo.png')}
@@ -17,38 +17,59 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
+        <ThemedView style={{ flex: 1 }}>
+          <ThemedText type="title" style={styles.heading}>
+            Welcome to <Text style={styles.highlight}>Team 7's</Text> FinTrack App
+          </ThemedText>
+          <ThemedText style={styles.subtitle}>
+            Simplify your money. Master your goals.
+          </ThemedText>
+        </ThemedView>
         <HelloWave />
       </ThemedView>
+
+      <ThemedView style={styles.authButtons}>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.button, styles.loginButton]}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+      </ThemedView>
+
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
+        <ThemedText type="subtitle">Your Smart Finance Companion</ThemedText>
         <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
+          FinTrack is a full-stack budgeting app designed to help users manage their finances with ease.
+          It connects your bank accounts, digital wallets, and even your crypto portfolios into one intuitive platform.
         </ThemedText>
       </ThemedView>
+
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
+        <ThemedText type="subtitle">Key Features</ThemedText>
         <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+          • Automatic & manual transaction tracking{'\n'}
+          • Smart categorization (rent, groceries, etc.){'\n'}
+          • Real-time cash flow insights by day, week, or month{'\n'}
+          • Goal tracking for savings or debt payoff{'\n'}
+          • Notifications for bills, low balance, and progress
         </ThemedText>
       </ThemedView>
+
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
+        <ThemedText type="subtitle">Who We Built It For</ThemedText>
         <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+          From young adults building financial habits to professionals managing investments, FinTrack supports anyone looking to make informed money decisions.
+        </ThemedText>
+      </ThemedView>
+
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">What Powers Our App</ThemedText>
+        <ThemedText>
+          • Supabase (PostgreSQL) for secure data storage and auth{'\n'}
+          • React Native for a modern, cross-platform UI{'\n'}
+          • Node.js & Express for backend API and data processing{'\n'}
+          • Plaid API for safe bank account integration
         </ThemedText>
       </ThemedView>
     </ParallaxScrollView>
@@ -60,16 +81,50 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginTop: 12,
+    paddingHorizontal: 16,
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#004225',
+  },
+  highlight: {
+    color: '#007F5F',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#444',
+    marginTop: 4,
   },
   stepContainer: {
     gap: 8,
-    marginBottom: 8,
+    marginBottom: 12,
+    paddingHorizontal: 16,
   },
   reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+    width: '100%',
+    height: 220,
+    resizeMode: 'cover',
+  },
+  authButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 16,
+    marginVertical: 16,
+  },
+  button: {
+    backgroundColor: '#007F5F',
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  loginButton: {
+    backgroundColor: '#004225',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
   },
 });
