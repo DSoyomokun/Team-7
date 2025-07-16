@@ -2,8 +2,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 const config = {
-  url: process.env.NEXT_PUBLIC_SUPABASE_URL,
-  key: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  url: process.env.SUPABASE_URL,
+  key: process.env.SUPABASE_KEY,
   options: {
     auth: { persistSession: true },
     realtime: { params: { eventsPerSecond: 10 } }
@@ -49,3 +49,4 @@ class SupabaseClient {
 }
 
 export default new SupabaseClient().client;
+

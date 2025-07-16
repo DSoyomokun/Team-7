@@ -1,4 +1,4 @@
-const supabase = require('../config/database');
+const { supabase } = require('../config/database');
 const {hashPassword, comparePasswords} = require('../utils/auth');
 
 class AuthService{
@@ -13,7 +13,7 @@ class AuthService{
             }
         });
 
-        if(error) throw new Error(erroor.message);
+        if(error) throw new Error(error.message);
         return data;
     }
 

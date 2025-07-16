@@ -1,5 +1,5 @@
-// backend/src/services/user.service.js
-const supabase = require('../config/database');
+
+const { supabase } = require('../config/database');
 const UserRepository = require('../models/repositories/user.repository');
 
 class UserService {
