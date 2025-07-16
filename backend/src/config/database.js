@@ -1,7 +1,7 @@
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 
-// Correct way to access environment variables (no dots after process.env)
+
 const supabaseUrl = process.env.SUPABASE_URL; // Should be "https://immywbjpwmdmbcuknpwb.supabase.co"
 const supabaseKey = process.env.SUPABASE_KEY; // Should be "eyJhbGci...."
 
@@ -34,7 +34,7 @@ testConnection();
 
 module.exports = {
     supabase,
-    query: async (table, operation, params = {}) => {  // Fixed parameter name (was WebTransportBidirectionalStream)
+    query: async (table, operation, params = {}) => {  
         const operations = {
             insert: () => supabase.from(table).insert(params.data),
             select: () => supabase.from(table).select(params.columns || '*'),
