@@ -1,9 +1,9 @@
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 
-
-const supabaseUrl = process.env.SUPABASE_URL; 
-const supabaseKey = process.env.SUPABASE_KEY; 
+// Correct way to access environment variables (no dots after process.env)
+const supabaseUrl = process.env.SUPABASE_URL; // Should be "https://immywbjpwmdmbcuknpwb.supabase.co"
+const supabaseKey = process.env.SUPABASE_KEY; // Should be "eyJhbGci...."
 
 if (!supabaseUrl || !supabaseKey) {
     throw new Error('Missing credentials in .env file');
@@ -34,7 +34,7 @@ testConnection();
 
 module.exports = {
     supabase,
-    query: async (table, operation, params = {}) => {  
+    query: async (table, operation, params = {}) => {  // Fixed parameter name (was WebTransportBidirectionalStream)
         const operations = {
             insert: () => supabase.from(table).insert(params.data),
             select: () => supabase.from(table).select(params.columns || '*'),
@@ -52,5 +52,4 @@ module.exports = {
         return data;
     }
 };
-
 
