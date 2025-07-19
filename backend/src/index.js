@@ -6,7 +6,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 // Import shared data and routes
-const { users, transactions } = require('./shared/data');
+const { users } = require('./shared/data');
 const routes = require('./routes');
 
 const app = express();

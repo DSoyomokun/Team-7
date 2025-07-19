@@ -1,4 +1,4 @@
-const { transactions } = require('../shared/data');
+const transactionAdapter = require('../adapters/transactionAdapter');
 
 const transactionController = {
   addIncome: (req, res) => {
@@ -6,17 +6,15 @@ const transactionController = {
     if (!amount || amount <= 0) {
       return res.status(400).json({ success: false, error: 'Amount must be positive' });
     }
-    const transaction = {
-      id: Date.now().toString(),
+    const transactionData = {
       userId: req.userId,
       type: 'income',
       amount,
       category,
       description,
-      date: date || new Date(),
-      createdAt: new Date()
+      date: date || new Date()
     };
-    transactions.push(transaction);
+    const transaction = transactionAdapter.addTransaction(transactionData);
     res.status(201).json({ success: true, message: 'Income transaction added successfully', data: transaction });
   },
   addExpense: (req, res) => {
@@ -27,36 +25,29 @@ const transactionController = {
     if (!category) {
       return res.status(400).json({ success: false, error: 'Category is required' });
     }
-    const transaction = {
-      id: Date.now().toString(),
+    const transactionData = {
       userId: req.userId,
       type: 'expense',
       amount,
       category,
       description,
-      date: date || new Date(),
-      createdAt: new Date()
+      date: date || new Date()
     };
-    transactions.push(transaction);
+    const transaction = transactionAdapter.addTransaction(transactionData);
     res.status(201).json({ success: true, message: 'Expense transaction added successfully', data: transaction });
   },
   incomeSummary: (req, res) => {
-    const userIncome = transactions.filter(t => t.userId === req.userId && t.type === 'income');
-    const totalIncome = userIncome.reduce((sum, t) => sum + t.amount, 0);
-    res.status(200).json({ success: true, data: { totalIncome, incomeCount: userIncome.length, transactions: userIncome } });
+    const incomeData = transactionAdapter.getUserIncome(req.userId);
+    res.status(200).json({ success: true, data: incomeData });
   },
   expenseSummary: (req, res) => {
-    const userExpenses = transactions.filter(t => t.userId === req.userId && t.type === 'expense');
-    const totalExpenses = userExpenses.reduce((sum, t) => sum + t.amount, 0);
-    res.status(200).json({ success: true, data: { totalExpenses, expenseCount: userExpenses.length, transactions: userExpenses } });
+    const expenseData = transactionAdapter.getUserExpenses(req.userId);
+    res.status(200).json({ success: true, data: expenseData });
   },
   getExpenses: (req, res) => {
     const { category } = req.query;
-    let userExpenses = transactions.filter(t => t.userId === req.userId && t.type === 'expense');
-    if (category) {
-      userExpenses = userExpenses.filter(t => t.category === category);
-    }
-    res.status(200).json({ success: true, data: { transactions: userExpenses } });
+    const expenseData = transactionAdapter.getUserExpenses(req.userId, category);
+    res.status(200).json({ success: true, data: { transactions: expenseData.transactions } });
   }
 };
 
