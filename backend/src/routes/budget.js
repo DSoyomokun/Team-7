@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { transactions } = require('../shared/data');
+const transactionAdapter = require('../adapters/transactionAdapter');
 
 // Mock authentication middleware
 const authMiddleware = (req, res, next) => {
@@ -17,22 +17,20 @@ const authMiddleware = (req, res, next) => {
 
 // GET /api/budget/summary
 router.get('/summary', authMiddleware, (req, res) => {
-  const userTransactions = transactions.filter(t => t.userId === req.userId);
-  const income = userTransactions.filter(t => t.type === 'income');
-  const expenses = userTransactions.filter(t => t.type === 'expense');
+  const userTransactions = transactionAdapter.getUserTransactions(req.userId);
+  const incomeData = transactionAdapter.getUserIncome(req.userId);
+  const expenseData = transactionAdapter.getUserExpenses(req.userId);
 
-  const totalIncome = income.reduce((sum, t) => sum + t.amount, 0);
-  const totalExpenses = expenses.reduce((sum, t) => sum + t.amount, 0);
-  const balance = totalIncome - totalExpenses;
+  const balance = incomeData.totalIncome - expenseData.totalExpenses;
 
   res.status(200).json({
     success: true,
     data: {
-      totalIncome,
-      totalExpenses,
+      totalIncome: incomeData.totalIncome,
+      totalExpenses: expenseData.totalExpenses,
       balance,
-      incomeCount: income.length,
-      expenseCount: expenses.length,
+      incomeCount: incomeData.incomeCount,
+      expenseCount: expenseData.expenseCount,
       recentTransactions: userTransactions.slice(-5)
     }
   });
@@ -40,7 +38,7 @@ router.get('/summary', authMiddleware, (req, res) => {
 
 // GET /api/budget/categories
 router.get('/categories', authMiddleware, (req, res) => {
-  const userTransactions = transactions.filter(t => t.userId === req.userId);
+  const userTransactions = transactionAdapter.getUserTransactions(req.userId);
   const expenseCategories = {};
   const incomeCategories = {};
 
@@ -65,12 +63,11 @@ router.get('/categories', authMiddleware, (req, res) => {
 
 // GET /api/budget/monthly-progress
 router.get('/monthly-progress', authMiddleware, (req, res) => {
-  const userTransactions = transactions.filter(t => t.userId === req.userId);
-  const income = userTransactions.filter(t => t.type === 'income');
-  const expenses = userTransactions.filter(t => t.type === 'expense');
+  const incomeData = transactionAdapter.getUserIncome(req.userId);
+  const expenseData = transactionAdapter.getUserExpenses(req.userId);
 
-  const monthlyIncome = income.reduce((sum, t) => sum + t.amount, 0);
-  const monthlyExpenses = expenses.reduce((sum, t) => sum + t.amount, 0);
+  const monthlyIncome = incomeData.totalIncome;
+  const monthlyExpenses = expenseData.totalExpenses;
   const remainingBudget = monthlyIncome - monthlyExpenses;
   const spendingPercentage = monthlyIncome > 0 ? (monthlyExpenses / monthlyIncome) * 100 : 0;
 
