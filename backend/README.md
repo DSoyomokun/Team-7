@@ -1,6 +1,6 @@
 # Team-7 Budget Backend API
 
-A Node.js/Express backend API for the Team-7 Budget tracking application.
+A TypeScript Node.js/Express backend API for the Team-7 Budget tracking application.
 
 ## Features
 
@@ -10,19 +10,23 @@ A Node.js/Express backend API for the Team-7 Budget tracking application.
 - **Budget Summary** - View financial overview and analytics
 - **Category Management** - Organize transactions by categories
 - **RESTful API** - Clean, documented endpoints
+- **TypeScript** - Full type safety and modern development experience
+- **Adapter Pattern** - Clean data access layer for easy database integration
 
 ## Project Structure
 
 ```
 backend/
 ├── src/
-│   ├── controllers/     # Business logic for API endpoints
-│   ├── models/         # Data models and database interactions
+│   ├── adapters/       # Data access layer with transaction management
+│   ├── controllers/    # Business logic for API endpoints
 │   ├── routes/         # API route definitions
-│   ├── middlewares/    # Authentication, validation, error handling
-│   ├── utils/          # Helper functions and utilities
+│   ├── shared/         # Shared data stores and utilities
+│   ├── types/          # TypeScript type definitions
 │   ├── __tests__/      # Unit tests
-│   └── index.js        # Main server file
+│   └── index.ts        # Main server file
+├── dist/               # Compiled TypeScript output
+├── tsconfig.json       # TypeScript configuration
 ├── .env                # Environment variables
 ├── .gitignore          # Git ignore rules
 ├── package.json        # Dependencies and scripts
@@ -63,28 +67,28 @@ This project includes comprehensive unit tests covering four main scenarios:
 - User successfully logs in and receives authentication token
 - System validates credentials and handles errors
 
-**Test Files:** `src/__tests__/auth.test.js`
+**Test Files:** `src/__tests__/auth.test.ts`
 
 #### **Scenario 2: User Adds Income Transaction**
 - User logs in and adds income transaction with amount and category
 - System validates transaction data and updates user's income summary
 - User can view their income history and totals
 
-**Test Files:** `src/__tests__/income.test.js`
+**Test Files:** `src/__tests__/income.test.ts`
 
 #### **Scenario 3: User Adds Expense Transaction**
 - User logs in and adds expense transaction with amount and category
 - System validates transaction data and updates user's expense summary
 - User can filter expenses by category and view summaries
 
-**Test Files:** `src/__tests__/expense.test.js`
+**Test Files:** `src/__tests__/expense.test.ts`
 
 #### **Scenario 4: User Views Budget Summary**
 - User logs in and views complete financial overview
 - System calculates total income, expenses, and remaining balance
 - User can view category breakdowns and monthly progress
 
-**Test Files:** `src/__tests__/budget-summary.test.js`
+**Test Files:** `src/__tests__/budget-summary.test.ts`
 
 ### **Running Tests**
 
@@ -129,12 +133,81 @@ The tests cover:
 - `GET /api/budget/categories` - Category breakdown
 - `GET /api/budget/monthly-progress` - Monthly spending progress
 
+## Architecture
+
+### Adapter Pattern Implementation
+
+This project implements the **Adapter Pattern** for data access, providing a clean abstraction layer between business logic and data storage.
+
+#### Benefits
+- **Database Independence** - Easy migration from in-memory storage to any database
+- **Consistent API** - Standardized methods for data operations
+- **Testability** - Simple to mock and test data operations
+- **Maintainability** - Centralized data access logic
+
+#### Current Implementation
+```typescript
+// src/adapters/transactionAdapter.ts
+const transactionAdapter = {
+  addTransaction: (transaction) => Transaction,
+  getUserTransactions: (userId, type?) => Transaction[],
+  getUserIncome: (userId) => IncomeData,
+  getUserExpenses: (userId, category?) => ExpenseData,
+  updateTransaction: (id, updates) => Transaction | null,
+  deleteTransaction: (id) => Transaction | null
+};
+```
+
+#### Usage in Controllers
+```typescript
+// Controllers use adapter instead of direct data access
+const transaction = transactionAdapter.addTransaction(transactionData);
+const incomeData = transactionAdapter.getUserIncome(req.userId);
+```
+
+#### Future Database Integration
+The adapter pattern makes it easy to switch from in-memory storage to any database:
+```typescript
+// Easy to replace implementation without changing controllers
+const transactionAdapter = {
+  addTransaction: async (transaction) => {
+    return await db.transactions.create(transaction);
+  },
+  // ... other methods
+};
+```
+
+## TypeScript Development
+
+This project is built with TypeScript for enhanced developer experience and type safety.
+
+### Key TypeScript Features
+- **Strict type checking** - Catches errors at compile time
+- **Interface definitions** - Clear data structure contracts
+- **ES6+ modules** - Modern import/export syntax
+- **Express typing** - Full type support for requests and responses
+- **Test typing** - Type-safe test development with Jest
+
+### Building and Running
+```bash
+# Development (with auto-reload)
+npm run dev
+
+# Build for production
+npm run build
+
+# Run built application
+npm start
+```
+
 ## Development
 
 ### Scripts
-- `npm start` - Start production server
-- `npm run dev` - Start development server with nodemon
-- `npm test` - Run tests
+- `npm run build` - Compile TypeScript to JavaScript
+- `npm start` - Start production server (requires build)
+- `npm run dev` - Start development server with ts-node-dev
+- `npm run dev:js` - Start development server with JavaScript fallback
+- `npm test` - Run tests with Jest and ts-jest
 - `npm run test:watch` - Run tests in watch mode
 - `npm run test:coverage` - Run tests with coverage
 
