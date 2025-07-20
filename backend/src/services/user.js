@@ -1,6 +1,6 @@
 
 const { supabase } = require('../config/database');
-const UserRepository = require('../models/repositories/user.repository');
+const UserRepository = require('../models/repository/user.repository');
 
 class UserService {
   static async getProfile(userId) {

@@ -1,5 +1,5 @@
 // backend/services/transaction.service.js
-const TransactionRepository = require('../models/repositories/transaction.repository');
+const TransactionRepository = require('../models/repository/transaction.repository');
 
 class TransactionService {
   static async createTransaction(userId, transactionData) {
