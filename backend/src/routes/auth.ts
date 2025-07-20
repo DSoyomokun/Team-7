@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import AuthService from '../services/auth.service';
+import authAdapter from '../adapters/authAdapter';
 import { validateSignUp, validateLogin } from '../middleware/validation';
 
 const router = express.Router();
@@ -8,10 +8,28 @@ const router = express.Router();
 router.post('/signup', validateSignUp, async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    const result = await AuthService.signUp(email, password);
+    const result = await authAdapter.signUp(email, password);
     res.status(201).json({ message: 'User created successfully', data: result });
   } catch (error: any) {
     res.status(400).json({ error: error.message });
+  }
+});
+
+// Register (legacy support)
+router.post('/register', async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+    const result = await authAdapter.signUp(email, password);
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully',
+      data: result
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
   }
 });
 
@@ -19,7 +37,7 @@ router.post('/signup', validateSignUp, async (req: Request, res: Response) => {
 router.post('/login', validateLogin, async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    const result = await AuthService.login(email, password);
+    const result = await authAdapter.login(email, password);
     res.json({ message: 'Login successful', data: result });
   } catch (error: any) {
     res.status(401).json({ error: error.message });
@@ -29,7 +47,7 @@ router.post('/login', validateLogin, async (req: Request, res: Response) => {
 // Logout
 router.post('/logout', async (req: Request, res: Response) => {
   try {
-    await AuthService.logout();
+    await authAdapter.logout();
     res.json({ message: 'Logout successful' });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -39,7 +57,7 @@ router.post('/logout', async (req: Request, res: Response) => {
 // Get session
 router.get('/session', async (req: Request, res: Response) => {
   try {
-    const session = await AuthService.getSession();
+    const session = await authAdapter.getSession();
     res.json({ session });
   } catch (error: any) {
     res.status(401).json({ error: error.message });
