@@ -1,5 +1,4 @@
-// backend/models/repositories/transaction.repository.js
-const supabase = require('../../../config/database');
+const { supabase } = require('../../config/database');
 const Transaction = require('../Transaction');
 
 class TransactionRepository {
@@ -10,6 +9,7 @@ class TransactionRepository {
       .select();
 
     if (error) throw new Error(`Transaction creation failed: ${error.message}`);
+    if (!data || !data[0]) throw new Error('Transaction creation failed: No data returned');
     return new Transaction(data[0]);
   }
 
@@ -26,6 +26,7 @@ class TransactionRepository {
 
     const { data, error } = await query;
     if (error) throw new Error(`Transaction query failed: ${error.message}`);
+    if (!data) return [];
     
     return data.map(t => new Transaction(t));
   }
@@ -42,8 +43,4 @@ class TransactionRepository {
   }
 }
 
-module.exports = TransactionRepository;
-
-
-
-
+module.exports = TransactionRepository; 
