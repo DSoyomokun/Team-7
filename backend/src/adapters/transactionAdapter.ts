@@ -1,4 +1,4 @@
-import { transactions } from '../shared/data';
+import TransactionService from '../services/transaction_service';
 import { Transaction, CreateTransactionRequest } from '../types';
 
 interface IncomeData {
@@ -14,67 +14,73 @@ interface ExpenseData {
 }
 
 const transactionAdapter = {
-  addTransaction: (transaction: CreateTransactionRequest & { userId: string }): Transaction => {
-    const newTransaction: Transaction = {
-      id: Date.now().toString(),
-      ...transaction,
-      date: new Date(transaction.date),
-      createdAt: new Date()
-    };
-    transactions.push(newTransaction);
-    return newTransaction;
+  // New unified create method
+  createTransaction: async (userId: string, transactionData: any): Promise<Transaction> => {
+    return await TransactionService.createTransaction(userId, transactionData);
   },
 
-  getUserTransactions: (userId: string, type: 'income' | 'expense' | null = null): Transaction[] => {
-    let userTransactions = transactions.filter(t => t.userId === userId);
-    if (type) {
-      userTransactions = userTransactions.filter(t => t.type === type);
-    }
-    return userTransactions;
+  // Legacy method for backward compatibility
+  addTransaction: async (transaction: CreateTransactionRequest & { userId: string }): Promise<Transaction> => {
+    const { userId, ...transactionData } = transaction;
+    return await TransactionService.createTransaction(userId, transactionData);
   },
 
-  getUserIncome: (userId: string): IncomeData => {
-    const userIncome = transactions.filter(t => t.userId === userId && t.type === 'income');
-    const totalIncome = userIncome.reduce((sum, t) => sum + t.amount, 0);
+  // New unified get method with filters
+  getTransactions: async (userId: string, filters?: any): Promise<Transaction[]> => {
+    return await TransactionService.getTransactions(userId, filters);
+  },
+
+  // Legacy method for backward compatibility
+  getUserTransactions: async (userId: string, type: 'income' | 'expense' | null = null): Promise<Transaction[]> => {
+    const filters = type ? { type } : {};
+    return await TransactionService.getTransactions(userId, filters);
+  },
+
+  getUserIncome: async (userId: string): Promise<IncomeData> => {
+    const transactions = await TransactionService.getTransactions(userId, { type: 'income' });
+    const totalIncome = transactions.reduce((sum, t) => sum + t.amount, 0);
     return {
       totalIncome,
-      incomeCount: userIncome.length,
-      transactions: userIncome
+      incomeCount: transactions.length,
+      transactions
     };
   },
 
-  getUserExpenses: (userId: string, category: string | null = null): ExpenseData => {
-    let userExpenses = transactions.filter(t => t.userId === userId && t.type === 'expense');
-    if (category) {
-      userExpenses = userExpenses.filter(t => t.category === category);
-    }
-    const totalExpenses = userExpenses.reduce((sum, t) => sum + t.amount, 0);
+  getUserExpenses: async (userId: string, category: string | null = null): Promise<ExpenseData> => {
+    const filters: any = { type: 'expense' };
+    if (category) filters.category = category;
+    
+    const transactions = await TransactionService.getTransactions(userId, filters);
+    const totalExpenses = transactions.reduce((sum, t) => sum + t.amount, 0);
     return {
       totalExpenses,
-      expenseCount: userExpenses.length,
-      transactions: userExpenses
+      expenseCount: transactions.length,
+      transactions
     };
   },
 
-  getTransactionById: (id: string): Transaction | undefined => {
-    return transactions.find(t => t.id === id);
+  // New methods from TransactionService
+  analyzeSpending: async (userId: string, category: string): Promise<number> => {
+    return await TransactionService.analyzeSpending(userId, category);
   },
 
-  updateTransaction: (id: string, updates: Partial<Transaction>): Transaction | null => {
-    const index = transactions.findIndex(t => t.id === id);
-    if (index !== -1) {
-      transactions[index] = { ...transactions[index], ...updates };
-      return transactions[index];
-    }
-    return null;
+  detectRecurringPayments: async (userId: string): Promise<any[]> => {
+    return await TransactionService.detectRecurringPayments(userId);
   },
 
-  deleteTransaction: (id: string): Transaction | null => {
-    const index = transactions.findIndex(t => t.id === id);
-    if (index !== -1) {
-      return transactions.splice(index, 1)[0];
-    }
-    return null;
+  getTransactionById: async (id: string): Promise<Transaction | undefined> => {
+    // Note: This would need to be implemented in TransactionService
+    throw new Error('getTransactionById not yet implemented with database');
+  },
+
+  updateTransaction: async (id: string, updates: Partial<Transaction>): Promise<Transaction | null> => {
+    // Note: This would need to be implemented in TransactionService
+    throw new Error('updateTransaction not yet implemented with database');
+  },
+
+  deleteTransaction: async (id: string): Promise<Transaction | null> => {
+    // Note: This would need to be implemented in TransactionService
+    throw new Error('deleteTransaction not yet implemented with database');
   }
 };
 
