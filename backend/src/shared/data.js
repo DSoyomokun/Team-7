@@ -37,7 +37,7 @@ class DataStore {
     for (const [_, txn] of this.transactions) {
       await supabase.from('transactions').insert(txn);
     }
-    console.log(`✅ Migrated ${this.users.size} users and ${this.transactions.size} transactions`);
+    console.log(`Migrated ${this.users.size} users and ${this.transactions.size} transactions`);
   }
 }
 

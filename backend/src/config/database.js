@@ -41,12 +41,12 @@ const testConnection = async () => {
             }
         }
 
-        console.log('✅ Database connected successfully');
+        console.log('Database connected successfully');
         console.log(`Connected to Supabase project: ${supabaseUrl.replace('https://', '').split('.')[0]}`);
     } catch (error) {
-        console.error('❌ Database connection failed');
+        console.error('Database connection failed');
         console.error('Error:', error.message);
-        console.log('⚠️  Continuing without database connection test...');
+        console.log('Continuing without database connection test...');
     }
 };
 
