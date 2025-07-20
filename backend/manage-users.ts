@@ -1,7 +1,14 @@
-const { supabase } = require('./src/config/database');
+import { supabase } from './src/config/database';
 
-// Sample users to insert
-const sampleUsers = [
+// Type for the sample user
+interface SampleUser {
+  email: string;
+  password: string;
+  full_name: string;
+  avatar_url: string | null;
+}
+
+const sampleUsers: SampleUser[] = [
   {
     email: 'john@team7.com',
     password: 'password123',
@@ -9,7 +16,7 @@ const sampleUsers = [
     avatar_url: null
   },
   {
-    email: 'jane@team7.com', 
+    email: 'jane@team7.com',
     password: 'password123',
     full_name: 'Jane Smith',
     avatar_url: null
@@ -22,14 +29,14 @@ const sampleUsers = [
   }
 ];
 
-async function createUsers() {
+async function createUsers(): Promise<void> {
   console.log('👥 Creating sample users in Supabase...\n');
 
   for (const user of sampleUsers) {
     try {
       console.log(`📝 Creating user: ${user.email}`);
-      
-      // Create auth user
+
+      // Supabase Admin API typically returns data types—update the types here for your library version if you want!
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: user.email,
         password: user.password,
@@ -41,11 +48,14 @@ async function createUsers() {
         continue;
       }
 
+      // If authData.user may be undefined, you can include a check here.
+      const userId = authData.user.id;
+
       // Create profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .insert({
-          user_id: authData.user.id,
+          user_id: userId,
           full_name: user.full_name,
           avatar_url: user.avatar_url,
           updated_at: new Date().toISOString()
@@ -57,14 +67,14 @@ async function createUsers() {
         console.log(`  ❌ Profile creation failed: ${profileError.message}`);
       } else {
         console.log(`  ✅ User created successfully: ${user.email}`);
-        console.log(`     User ID: ${authData.user.id}`);
+        console.log(`     User ID: ${userId}`);
         console.log(`     Password: ${user.password}`);
       }
 
-    } catch (error) {
+    } catch (error: any) {
       console.log(`  ❌ Error creating user ${user.email}: ${error.message}`);
     }
-    
+
     console.log(''); // Empty line
   }
 
@@ -75,4 +85,4 @@ async function createUsers() {
   });
 }
 
-createUsers().catch(console.error); 
+createUsers().catch(console.error);
