@@ -1,81 +1,73 @@
 import express, { Request, Response } from 'express';
-import { users } from '../shared/data';
-import { User, CreateUserRequest, LoginRequest } from '../types';
+import authAdapter from '../adapters/authAdapter';
 
 const router = express.Router();
 
-// POST /auth/register
-router.post('/register', (req: Request, res: Response) => {
-  const { email, password, name } = req.body;
-
-  // Check if user already exists
-  const existingUser = users.find(user => user.email === email);
-  if (existingUser) {
-    return res.status(400).json({
-      success: false,
-      error: 'User already exists'
-    });
+// Sign up
+router.post('/signup', async (req: Request, res: Response) => {
+  try {
+    const { email, password, name } = req.body;
+    const result = await authAdapter.signUp(email, password, name);
+    res.status(201).json({ message: 'User created successfully', data: result });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
   }
-
-  // Create new user with a mock ID
-  const newUser = {
-    id: Date.now().toString(),
-    email,
-    name,
-    password: 'mock_hashed_password' // In real implementation, this would be hashed
-  };
-
-  users.push(newUser);
-
-  res.status(201).json({
-    success: true,
-    message: 'User registered successfully',
-    data: {
-      email: newUser.email,
-      name: newUser.name,
-      id: newUser.id
-    }
-  });
 });
 
-// POST /auth/login
-router.post('/login', (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  
-  // Find user by email
-  const user = users.find(u => u.email === email);
-  if (!user) {
-    return res.status(401).json({
+// Register (legacy support)
+router.post('/register', async (req: Request, res: Response) => {
+  try {
+    const { email, password, name } = req.body;
+    const result = await authAdapter.signUp(email, password, name);
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully',
+      data: result
+    });
+  } catch (error: any) {
+    res.status(400).json({
       success: false,
-      error: 'Invalid credentials'
+      error: error.message
     });
   }
+});
 
-  // In a real implementation, we would verify the password hash
-  // For now, we'll just check if any password was provided
-  if (!password) {
-    return res.status(401).json({
+// Login
+router.post('/login', async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+    const result = await authAdapter.login(email, password);
+    res.json({ 
+      success: true,
+      message: 'Login successful', 
+      data: result 
+    });
+  } catch (error: any) {
+    res.status(401).json({ 
       success: false,
-      error: 'Invalid credentials'
+      error: error.message 
     });
   }
+});
 
-  // Generate a mock token
-  const token = `mock_token_${user.id}_${Date.now()}`;
+// Logout
+router.post('/logout', async (req: Request, res: Response) => {
+  try {
+    await authAdapter.logout();
+    res.json({ message: 'Logout successful' });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
-  // Return response with message field to match test expectations
-  res.json({
-    success: true,
-    message: 'Login successful',
-    data: {
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name
-      }
-    }
-  });
+// Get session
+router.get('/session', async (req: Request, res: Response) => {
+  try {
+    const session = await authAdapter.getSession();
+    res.json({ session });
+  } catch (error: any) {
+    res.status(401).json({ error: error.message });
+  }
 });
 
 export default router;

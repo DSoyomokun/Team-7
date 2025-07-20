@@ -1,10 +1,10 @@
 # Team-7 Budget Backend API
 
-A TypeScript Node.js/Express backend API for the Team-7 Budget tracking application.
+A TypeScript Node.js/Express backend API for the Team-7 Budget tracking application, built with TypeScript, Express.js, and Supabase.
 
 ## Features
 
-- **User Authentication** - Registration and login with JWT tokens
+- **User Authentication** - Registration, login, logout with JWT tokens
 - **Income Management** - Add and track income transactions
 - **Expense Management** - Add and track expense transactions  
 - **Budget Summary** - View financial overview and analytics
@@ -54,8 +54,13 @@ backend/
 4. **Run tests:**
    ```bash
    npm test
+<<<<<<< HEAD
    ```
 
+=======
+   
+   ```
+>>>>>>> 3229dda317641952ba5da6a1200a631cd319291f
 ## Testing
 
 This project includes comprehensive unit tests covering four main scenarios:
@@ -113,11 +118,27 @@ The tests cover:
 -  **Error handling** (invalid data, authentication failures)
 -  **API response formats** (consistent JSON structure)
 
+<<<<<<< HEAD
 ## API Endpoints
 
 ### Authentication
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - User login
+=======
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/signup` - User registration
+- `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - User logout
+- `GET /api/auth/session` - Get current session
+
+### Users
+- `GET /api/users/profile` - Get user profile
+- `PUT /api/users/profile` - Update user profile
+- `DELETE /api/users/account` - Delete user account
+>>>>>>> 3229dda317641952ba5da6a1200a631cd319291f
 
 ### Income Transactions
 - `POST /api/transactions/income` - Add income transaction
@@ -218,6 +239,19 @@ NODE_ENV=development
 JWT_SECRET=your_jwt_secret_here
 DATABASE_URL=your_database_url_here
 ```
+<<<<<<< HEAD
 
 
 MIT License 
+=======
+ 
+## Security
+
+- Rate limiting enabled
+- Helmet.js for security headers
+- CORS enabled
+- Input validation
+- Authentication middleware
+
+MIT License
+>>>>>>> 3229dda317641952ba5da6a1200a631cd319291f
