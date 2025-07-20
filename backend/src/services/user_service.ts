@@ -1,5 +1,5 @@
 import { supabase } from '../config/database';
-import UserRepository from '../models/repository/user.repository';
+import UserRepository from '../repositories/user.repository';
 
 // Example type for a profile, adjust fields as necessary
 interface Profile {
