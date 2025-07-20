@@ -1,5 +1,5 @@
 import { supabase } from '../config/database';
-import UserRepository from '../repositories/user.repository';
+import { UserRepository } from '../repositories/user.repository';
 
 // Example type for a profile, adjust fields as necessary
 interface Profile {
@@ -27,7 +27,7 @@ class UserService {
   }
 
   static async deleteAccount(userId: string): Promise<void> {
-    await supabase.from('profiles').delete().eq('user_id', userId);
+    await UserRepository.delete(userId);
 
     const { error } = await supabase.auth.admin.deleteUser(userId);
     if (error) throw new Error(error.message);

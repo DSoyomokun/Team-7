@@ -1,11 +1,24 @@
-const { supabase } = require('../../config/database');
-const Transaction = require('../Transaction');
+import { supabase } from '../config/database';
+import { Transaction, TransactionProps } from '../models/Transaction';
 
-class TransactionRepository {
-  static async create(transactionData) {
+interface TransactionFilters {
+  startDate?: string;
+  endDate?: string;
+  category?: string;
+}
+
+interface MonthlySummary {
+  total_income: number;
+  total_expenses: number;
+  net_amount: number;
+  transaction_count: number;
+}
+
+export class TransactionRepository {
+  static async create(transactionData: Partial<TransactionProps>): Promise<Transaction> {
     const { data, error } = await supabase
       .from('transactions')
-      .insert(new Transaction(transactionData).toJSON())
+      .insert(new Transaction(transactionData as TransactionProps).toJSON())
       .select();
 
     if (error) throw new Error(`Transaction creation failed: ${error.message}`);
@@ -13,7 +26,7 @@ class TransactionRepository {
     return new Transaction(data[0]);
   }
 
-  static async findByUserId(userId, filters = {}) {
+  static async findByUserId(userId: string | number, filters: TransactionFilters = {}): Promise<Transaction[]> {
     let query = supabase
       .from('transactions')
       .select('*')
@@ -31,7 +44,7 @@ class TransactionRepository {
     return data.map(t => new Transaction(t));
   }
 
-  static async getMonthlySummary(userId, month, year) {
+  static async getMonthlySummary(userId: string | number, month: number, year: number): Promise<MonthlySummary> {
     const { data, error } = await supabase.rpc('get_monthly_summary', {
       user_id: userId,
       month,
@@ -42,5 +55,3 @@ class TransactionRepository {
     return data;
   }
 }
-
-module.exports = TransactionRepository; 

@@ -1,4 +1,4 @@
-import TransactionRepository from '../repositories/transaction.repository';
+import { TransactionRepository } from '../repositories/transaction.repository';
 
 // Type for a transaction object, adjust as needed based on your actual model
 interface Transaction {

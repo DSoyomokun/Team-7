@@ -1,7 +1,15 @@
-const { supabase } = require('../../config/database');
+import { supabase } from '../config/database';
 
-class UserRepository {
-  static async findById(userId) {
+interface UserData {
+  user_id: string;
+  email?: string;
+  name?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export class UserRepository {
+  static async findById(userId: string): Promise<UserData> {
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -12,7 +20,7 @@ class UserRepository {
     return data;
   }
 
-  static async create(userData) {
+  static async create(userData: Partial<UserData>): Promise<UserData> {
     const { data, error } = await supabase
       .from('profiles')
       .insert(userData)
@@ -23,7 +31,7 @@ class UserRepository {
     return data;
   }
 
-  static async update(userId, updates) {
+  static async update(userId: string, updates: Partial<UserData>): Promise<UserData> {
     const { data, error } = await supabase
       .from('profiles')
       .update(updates)
@@ -35,7 +43,7 @@ class UserRepository {
     return data;
   }
 
-  static async delete(userId) {
+  static async delete(userId: string): Promise<void> {
     const { error } = await supabase
       .from('profiles')
       .delete()
@@ -44,5 +52,3 @@ class UserRepository {
     if (error) throw new Error(`Failed to delete user: ${error.message}`);
   }
 }
-
-module.exports = UserRepository; 
