@@ -65,6 +65,8 @@ jspm_packages/
 *.swo
 *~
 
+Users/
+
 # OS generated files
 .DS_Store
 .DS_Store?
