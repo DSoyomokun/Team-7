@@ -54,13 +54,8 @@ backend/
 4. **Run tests:**
    ```bash
    npm test
-<<<<<<< HEAD
-   ```
-
-=======
    
    ```
->>>>>>> 3229dda317641952ba5da6a1200a631cd319291f
 ## Testing
 
 This project includes comprehensive unit tests covering four main scenarios:
@@ -118,13 +113,6 @@ The tests cover:
 -  **Error handling** (invalid data, authentication failures)
 -  **API response formats** (consistent JSON structure)
 
-<<<<<<< HEAD
-## API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - User login
-=======
 
 ## API Endpoints
 
@@ -138,7 +126,6 @@ The tests cover:
 - `GET /api/users/profile` - Get user profile
 - `PUT /api/users/profile` - Update user profile
 - `DELETE /api/users/account` - Delete user account
->>>>>>> 3229dda317641952ba5da6a1200a631cd319291f
 
 ### Income Transactions
 - `POST /api/transactions/income` - Add income transaction
@@ -239,11 +226,6 @@ NODE_ENV=development
 JWT_SECRET=your_jwt_secret_here
 DATABASE_URL=your_database_url_here
 ```
-<<<<<<< HEAD
-
-
-MIT License 
-=======
  
 ## Security
 
@@ -254,4 +236,3 @@ MIT License
 - Authentication middleware
 
 MIT License
->>>>>>> 3229dda317641952ba5da6a1200a631cd319291f
