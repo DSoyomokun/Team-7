@@ -3,10 +3,15 @@ dotenv.config();
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl: string | undefined = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey: string | undefined = process.env.SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
+let supabaseUrl: string = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+let supabaseKey: string = process.env.SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || '';
 
-if (!supabaseUrl || !supabaseKey) {
+// Use mock credentials for testing if real ones are missing
+if ((!supabaseUrl || !supabaseKey) && process.env.NODE_ENV === 'test') {
+    console.warn('Using mock Supabase credentials for testing');
+    supabaseUrl = 'https://test.supabase.co';
+    supabaseKey = 'test-key';
+} else if (!supabaseUrl || !supabaseKey) {
     console.error('Missing Supabase credentials in .env file');
     console.error('Please add:');
     console.error('SUPABASE_URL=https://immywbjpwmdmbcuknpwb.supabase.co');
@@ -71,18 +76,28 @@ export async function query(
     params: QueryParams = {}
 ): Promise<any> {
     const operations: Record<QueryOperation, () => Promise<any>> = {
-        insert: () => {
+        insert: async () => {
             if (!params.data) throw new Error('Missing data for insert');
-            return supabase.from(table).insert(params.data);
+            const { data, error } = await supabase.from(table).insert(params.data);
+            if (error) throw new Error(error.message);
+            return data;
         },
-        select: () => supabase.from(table).select(params.columns || '*'),
-        update: () => {
+        select: async () => {
+            const { data, error } = await supabase.from(table).select(params.columns || '*');
+            if (error) throw new Error(error.message);
+            return data;
+        },
+        update: async () => {
             if (!params.data || !params.where || params.equals === undefined) throw new Error('Missing parameters for update');
-            return supabase.from(table).update(params.data).eq(params.where, params.equals);
+            const { data, error } = await supabase.from(table).update(params.data).eq(params.where, params.equals);
+            if (error) throw new Error(error.message);
+            return data;
         },
-        delete: () => {
+        delete: async () => {
             if (!params.where || params.equals === undefined) throw new Error('Missing parameters for delete');
-            return supabase.from(table).delete().eq(params.where, params.equals);
+            const { data, error } = await supabase.from(table).delete().eq(params.where, params.equals);
+            if (error) throw new Error(error.message);
+            return data;
         }
     };
     if (!operations[operation]) {

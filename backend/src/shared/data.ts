@@ -1,5 +1,9 @@
 import { Transaction, User } from '../types';
 
+// Simple arrays for testing - this matches what the tests expect
+export const users: User[] = [];
+export const transactions: Transaction[] = [];
+
 class DataStore {
   private users: Map<string, User>;
   private transactions: Map<string, Transaction>;
@@ -16,6 +20,7 @@ class DataStore {
     const id = `user_${this.nextId++}`;
     const user: User = { ...userData, id };
     this.users.set(id, user);
+    users.push(user); // Also add to test array
     return user;
   }
 
@@ -38,6 +43,7 @@ class DataStore {
       createdAt: new Date()
     };
     this.transactions.set(id, txn);
+    transactions.push(txn); // Also add to test array
     return txn;
   }
 

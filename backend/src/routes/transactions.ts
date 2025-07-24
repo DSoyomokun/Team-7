@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import transactionAdapter from '../adapters/transactionAdapter';
-import { authenticateUser } from '../middlewares/auth';
+import { authenticateUser } from '../middleware/auth';
 
 const router = express.Router();
 
