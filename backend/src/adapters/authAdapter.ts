@@ -1,4 +1,4 @@
-import AuthService from '../services/auth.service';
+import AuthService from '../services/auth_service';
 
 interface AuthResult {
   user?: any;
@@ -7,8 +7,8 @@ interface AuthResult {
 }
 
 const authAdapter = {
-  signUp: async (email: string, password: string): Promise<AuthResult> => {
-    return await AuthService.signUp(email, password);
+  signUp: async (email: string, password: string, name?: string): Promise<AuthResult> => {
+    return await AuthService.signUp(email, password, name);
   },
 
   login: async (email: string, password: string): Promise<AuthResult> => {

@@ -8,12 +8,13 @@ export default class AuthService {
   /**
    * Sign up a new user.
    */
-  static async signUp(email: string, password: string): Promise<any> {
+  static async signUp(email: string, password: string, name?: string): Promise<any> {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
+          full_name: name || '',
           created_at: new Date().toISOString()
         }
       }
