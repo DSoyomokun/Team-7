@@ -6,6 +6,7 @@ import accountRoutes from './accounts';
 import userRoutes from './users';
 import goalRoutes from './goals';
 import dashboardRoutes from './dashboard';
+import reportRoutes from './reports';
 
 const router = express.Router();
 
@@ -17,6 +18,7 @@ router.use('/transactions', transactionRoutes);
 router.use('/budget', budgetRoutes);
 router.use('/goals', goalRoutes);
 router.use('/dashboard', dashboardRoutes);
+router.use('/reports', reportRoutes);
 
 // Health check endpoint
 router.get('/health', (req: Request, res: Response) => {

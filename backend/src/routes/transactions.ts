@@ -2,46 +2,51 @@ import express, { Request, Response } from 'express';
 import transactionAdapter from '../adapters/transactionAdapter';
 import transactionController from '../controllers/transactionController';
 import { authenticateUser } from '../middleware/auth';
+import { successResponse, errorResponse, RESPONSE_MESSAGES } from '../utils/response';
 
 const router = express.Router();
-
-interface AuthenticatedRequest extends Request {
-  user: { id: string };
-}
 
 // Create transaction (unified income/expense)
 router.post(
   '/',
   authenticateUser,
-  async (req: AuthenticatedRequest, res: Response) => {
+  async (req: Request, res: Response) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.id;
+      if (!userId) {
+        return errorResponse(res, 'User not authenticated', 401);
+      }
+      
       const { amount, type } = req.body;
       
       if (!amount || amount <= 0) {
-        return res.status(400).json({ error: 'Amount must be positive' });
+        return errorResponse(res, 'Amount must be positive', 400);
       }
       
       if (type === 'expense' && !req.body.category) {
-        return res.status(400).json({ error: 'Category is required for expenses' });
+        return errorResponse(res, 'Category is required for expenses', 400);
       }
       
       const transaction = await transactionAdapter.createTransaction(userId, req.body);
-      res.status(201).json({ message: 'Transaction created successfully', transaction });
+      successResponse(res, transaction, RESPONSE_MESSAGES.CREATED, 201);
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      errorResponse(res, error.message || 'Failed to create transaction', 400);
     }
   }
 );
 
 // POST /api/transactions/income (legacy support)
-router.post('/income', authenticateUser, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/income', authenticateUser, async (req: Request, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id;
+    if (!userId) {
+      return errorResponse(res, 'User not authenticated', 401);
+    }
+    
     const { amount, category, description, date } = req.body;
     
     if (!amount || amount <= 0) {
-      return res.status(400).json({ error: 'Amount must be positive' });
+      return errorResponse(res, 'Amount must be positive', 400);
     }
     
     const transactionData = {
@@ -53,23 +58,27 @@ router.post('/income', authenticateUser, async (req: AuthenticatedRequest, res: 
     };
     
     const transaction = await transactionAdapter.createTransaction(userId, transactionData);
-    res.status(201).json({ message: 'Income transaction added successfully', data: transaction });
+    successResponse(res, transaction, 'Income transaction added successfully', 201);
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    errorResponse(res, error.message || 'Failed to create income transaction', 400);
   }
 });
 
 // POST /api/transactions/expense (legacy support)
-router.post('/expense', authenticateUser, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/expense', authenticateUser, async (req: Request, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id;
+    if (!userId) {
+      return errorResponse(res, 'User not authenticated', 401);
+    }
+    
     const { amount, category, description, date } = req.body;
     
     if (!amount || amount <= 0) {
-      return res.status(400).json({ error: 'Amount must be greater than 0' });
+      return errorResponse(res, 'Amount must be greater than 0', 400);
     }
     if (!category) {
-      return res.status(400).json({ error: 'Category is required' });
+      return errorResponse(res, 'Category is required', 400);
     }
     
     const transactionData = {
@@ -81,9 +90,9 @@ router.post('/expense', authenticateUser, async (req: AuthenticatedRequest, res:
     };
     
     const transaction = await transactionAdapter.createTransaction(userId, transactionData);
-    res.status(201).json({ message: 'Expense transaction added successfully', data: transaction });
+    successResponse(res, transaction, 'Expense transaction added successfully', 201);
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    errorResponse(res, error.message || 'Failed to create expense transaction', 400);
   }
 });
 
@@ -91,91 +100,48 @@ router.post('/expense', authenticateUser, async (req: AuthenticatedRequest, res:
 router.get(
   '/',
   authenticateUser,
-  async (req: AuthenticatedRequest, res: Response) => {
+  async (req: Request, res: Response) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.id;
+      if (!userId) {
+        return errorResponse(res, 'User not authenticated', 401);
+      }
+      
       const filters = req.query;
       const transactions = await transactionAdapter.getTransactions(userId, filters);
-      res.json({ transactions });
+      successResponse(res, { transactions }, 'Transactions retrieved successfully');
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      errorResponse(res, error.message || 'Failed to retrieve transactions', 500);
     }
   }
 );
 
-// GET /api/transactions/income/summary (legacy support)
-router.get('/income/summary', authenticateUser, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user.id;
-    const transactions = await transactionAdapter.getTransactions(userId, { type: 'income' });
-    res.json({ success: true, data: transactions });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// GET /api/transactions/expense/summary (legacy support)
-router.get('/expense/summary', authenticateUser, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user.id;
-    const transactions = await transactionAdapter.getTransactions(userId, { type: 'expense' });
-    res.json({ success: true, data: transactions });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// GET /api/transactions/expense (with category filter, legacy support)
-router.get('/expense', authenticateUser, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user.id;
-    const { category } = req.query;
-    const filters: any = { type: 'expense' };
-    if (category) filters.category = category;
-    
-    const transactions = await transactionAdapter.getTransactions(userId, filters);
-    res.json({ success: true, data: { transactions } });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Analyze spending by category
+// Get transaction summary
 router.get(
-  '/analyze/:category',
+  '/summary',
   authenticateUser,
-  async (req: AuthenticatedRequest, res: Response) => {
+  async (req: Request, res: Response) => {
     try {
-      const userId = req.user.id;
-      const { category } = req.params;
-      const totalSpending = await transactionAdapter.analyzeSpending(userId, category);
-      res.json({ category, totalSpending });
+      const userId = req.user?.id;
+      if (!userId) {
+        return errorResponse(res, 'User not authenticated', 401);
+      }
+      
+      const { startDate, endDate } = req.query;
+      const incomeData = await transactionAdapter.getUserIncome(userId);
+      const expenseData = await transactionAdapter.getUserExpenses(userId);
+      
+      const summary = {
+        income: incomeData,
+        expenses: expenseData,
+        netAmount: incomeData.totalIncome - expenseData.totalExpenses
+      };
+      
+      successResponse(res, summary, 'Transaction summary retrieved successfully');
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      errorResponse(res, error.message || 'Failed to retrieve transaction summary', 500);
     }
   }
 );
-
-// Get recurring payments
-router.get(
-  '/recurring',
-  authenticateUser,
-  async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const userId = req.user.id;
-      const recurringPayments = await transactionAdapter.detectRecurringPayments(userId);
-      res.json({ recurringPayments });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  }
-);
-
-// New account-integrated endpoints
-// POST /api/transactions/with-account - Create transaction with account balance update
-router.post('/with-account', authenticateUser, transactionController.createTransaction);
-
-// GET /api/transactions/with-account - Get transactions with account filtering
-router.get('/with-account', authenticateUser, transactionController.getTransactions);
 
 export default router;
