@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import transactionAdapter from '../adapters/transactionAdapter';
 import transactionController from '../controllers/transactionController';
 import { authenticateUser } from '../middleware/auth';
+import { validateTransaction, validateDateRange, validatePagination } from '../middleware/validation';
 import { successResponse, errorResponse, RESPONSE_MESSAGES } from '../utils/response';
 
 const router = express.Router();
@@ -10,6 +11,7 @@ const router = express.Router();
 router.post(
   '/',
   authenticateUser,
+  validateTransaction,
   async (req: Request, res: Response) => {
     try {
       const userId = req.user?.id;
@@ -36,7 +38,7 @@ router.post(
 );
 
 // POST /api/transactions/income (legacy support)
-router.post('/income', authenticateUser, async (req: Request, res: Response) => {
+router.post('/income', authenticateUser, validateTransaction, async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
     if (!userId) {
@@ -65,7 +67,7 @@ router.post('/income', authenticateUser, async (req: Request, res: Response) => 
 });
 
 // POST /api/transactions/expense (legacy support)
-router.post('/expense', authenticateUser, async (req: Request, res: Response) => {
+router.post('/expense', authenticateUser, validateTransaction, async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
     if (!userId) {
@@ -100,6 +102,8 @@ router.post('/expense', authenticateUser, async (req: Request, res: Response) =>
 router.get(
   '/',
   authenticateUser,
+  validateDateRange,
+  validatePagination,
   async (req: Request, res: Response) => {
     try {
       const userId = req.user?.id;
@@ -120,6 +124,7 @@ router.get(
 router.get(
   '/summary',
   authenticateUser,
+  validateDateRange,
   async (req: Request, res: Response) => {
     try {
       const userId = req.user?.id;
