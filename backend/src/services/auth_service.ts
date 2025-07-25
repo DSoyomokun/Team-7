@@ -1,5 +1,6 @@
 import { supabase } from '../config/database';
 import { hashPassword, comparePasswords } from '../utils/auth';
+import { UserRepository } from '../repositories/user.repository';
 
 // You can create more precise types for Supabase responses if you wish.
 // For now, we use basic types for simplicity.
@@ -21,6 +22,22 @@ export default class AuthService {
     });
 
     if (error) throw new Error(error.message);
+
+    // Create profile record if user was successfully created
+    if (data.user) {
+      try {
+        await UserRepository.create({
+          user_id: data.user.id,
+          full_name: name || undefined,
+          currency_preference: 'USD'
+        });
+      } catch (profileError) {
+        console.error('Failed to create user profile:', profileError);
+        // Don't throw here as the auth user was created successfully
+        // The profile can be created later if needed
+      }
+    }
+
     return data;
   }
 

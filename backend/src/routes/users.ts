@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import userAdapter from '../adapters/userAdapter';
 import { authenticateUser } from '../middleware/auth';
+import { validateProfileUpdate, validatePreferencesUpdate } from '../middleware/validation';
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ router.get('/profile', authenticateUser, async (req: AuthenticatedRequest, res: 
 });
 
 // Update user profile
-router.put('/profile', authenticateUser, async (req: AuthenticatedRequest, res: Response) => {
+router.put('/profile', authenticateUser, validateProfileUpdate, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user.id;
     const updates = req.body;
@@ -58,7 +59,7 @@ router.get('/preferences', authenticateUser, async (req: AuthenticatedRequest, r
 });
 
 // Update user preferences
-router.put('/preferences', authenticateUser, async (req: AuthenticatedRequest, res: Response) => {
+router.put('/preferences', authenticateUser, validatePreferencesUpdate, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user.id;
     const preferences = req.body;
