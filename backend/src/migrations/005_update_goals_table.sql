@@ -1,4 +1,4 @@
--- Migration: Update goals table to match Story 1.5 requirements
+-- Migration: Update goals table to for tracking savings/debt goals
 -- Add type column for savings/debt tracking and updated_at timestamp
 
 ALTER TABLE goals 
