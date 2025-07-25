@@ -66,7 +66,7 @@ export class Transaction {
     if (!this.description) return false;
     const keywords = ['subscription', 'membership', 'monthly', 'weekly', 'annual', 'recurring'];
     return keywords.some(keyword =>
-      this.description.toLowerCase().includes(keyword)
+      this.description!.toLowerCase().includes(keyword)
     );
   }
 
