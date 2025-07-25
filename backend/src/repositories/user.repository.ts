@@ -3,7 +3,8 @@ import { supabase } from '../config/database';
 interface UserData {
   user_id: string;
   email?: string;
-  name?: string;
+  full_name?: string;
+  currency_preference?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -11,7 +12,7 @@ interface UserData {
 export class UserRepository {
   static async findById(userId: string): Promise<UserData> {
     const { data, error } = await supabase
-      .from('profiles')
+      .from('profile')
       .select('*')
       .eq('user_id', userId)
       .single();
@@ -22,7 +23,7 @@ export class UserRepository {
 
   static async create(userData: Partial<UserData>): Promise<UserData> {
     const { data, error } = await supabase
-      .from('profiles')
+      .from('profile')
       .insert(userData)
       .select()
       .single();
@@ -33,7 +34,7 @@ export class UserRepository {
 
   static async update(userId: string, updates: Partial<UserData>): Promise<UserData> {
     const { data, error } = await supabase
-      .from('profiles')
+      .from('profile')
       .update(updates)
       .eq('user_id', userId)
       .select()
@@ -45,7 +46,7 @@ export class UserRepository {
 
   static async delete(userId: string): Promise<void> {
     const { error } = await supabase
-      .from('profiles')
+      .from('profile')
       .delete()
       .eq('user_id', userId);
 

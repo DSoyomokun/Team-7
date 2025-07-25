@@ -1,19 +1,6 @@
 import UserService from '../services/user_service';
 import { User } from '../types';
-
-interface UserProfile {
-  id: string;
-  email: string;
-  name?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-interface UserPreferences {
-  theme?: 'light' | 'dark';
-  notifications?: boolean;
-  currency?: string;
-}
+import { UserProfile, UserPreferences } from '../models/User';
 
 const userAdapter = {
   // Get user profile by ID
