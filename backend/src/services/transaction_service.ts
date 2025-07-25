@@ -1,19 +1,41 @@
 import { TransactionRepository } from '../repositories/transaction.repository';
-
-// Type for a transaction object, adjust as needed based on your actual model
-interface Transaction {
-  amount: number;
-  category?: string;
-  isRecurring: () => boolean;
-  [key: string]: any; // Allow extra fields for flexibility
-}
+import { AccountService } from './account_service';
+import { Transaction, TransactionProps } from '../models/Transaction';
 
 class TransactionService {
-  static async createTransaction(userId: string, transactionData: Partial<Transaction>): Promise<Transaction> {
-    return await TransactionRepository.create({
+  static async createTransaction(userId: string, transactionData: Partial<TransactionProps>): Promise<Transaction> {
+    // Ensure user has a default account if no account_id provided
+    if (!transactionData.account_id) {
+      const defaultAccount = await AccountService.ensureDefaultAccount(userId);
+      transactionData.account_id = defaultAccount.id;
+    }
+
+    // Validate account belongs to user
+    if (transactionData.account_id) {
+      await AccountService.getAccountById(transactionData.account_id, userId);
+    }
+
+    // Create transaction
+    const transaction = await TransactionRepository.create({
       ...transactionData,
       user_id: userId
-    });
+    } as TransactionProps);
+
+    // Update account balance
+    if (transaction.account_id && transaction.amount && transaction.is_expense !== undefined) {
+      try {
+        await AccountService.updateBalanceForTransaction(
+          transaction.account_id,
+          transaction.amount,
+          transaction.is_expense
+        );
+      } catch (error) {
+        // Log error but don't fail transaction creation
+        console.error('Failed to update account balance:', error);
+      }
+    }
+
+    return transaction;
   }
 
   static async getTransactions(userId: string, filters: Record<string, any> = {}): Promise<Transaction[]> {

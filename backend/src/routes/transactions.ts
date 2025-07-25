@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import transactionAdapter from '../adapters/transactionAdapter';
+import transactionController from '../controllers/transactionController';
 import { authenticateUser } from '../middleware/auth';
 
 const router = express.Router();
@@ -169,5 +170,12 @@ router.get(
     }
   }
 );
+
+// New account-integrated endpoints
+// POST /api/transactions/with-account - Create transaction with account balance update
+router.post('/with-account', authenticateUser, transactionController.createTransaction);
+
+// GET /api/transactions/with-account - Get transactions with account filtering
+router.get('/with-account', authenticateUser, transactionController.getTransactions);
 
 export default router;
