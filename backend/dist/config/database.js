@@ -1,0 +1,106 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.supabase = void 0;
+exports.query = query;
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+const supabase_js_1 = require("@supabase/supabase-js");
+let supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+let supabaseKey = process.env.SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || '';
+// Use mock credentials for testing if real ones are missing
+if ((!supabaseUrl || !supabaseKey) && process.env.NODE_ENV === 'test') {
+    console.warn('Using mock Supabase credentials for testing');
+    supabaseUrl = 'https://test.supabase.co';
+    supabaseKey = 'test-key';
+}
+else if (!supabaseUrl || !supabaseKey) {
+    console.error('Missing Supabase credentials in .env file');
+    console.error('Please add:');
+    console.error('SUPABASE_URL=https://immywbjpwmdmbcuknpwb.supabase.co');
+    console.error('SUPABASE_KEY=sb_publishable_jGWo6hNjfBvJEd4ELkfSDQ_5E2xrr3Z');
+    throw new Error('Missing Supabase credentials in .env file');
+}
+exports.supabase = (0, supabase_js_1.createClient)(supabaseUrl, supabaseKey);
+// Test connection
+const testConnection = async () => {
+    try {
+        console.log('Testing database connection...');
+        console.log(`Connecting to: ${supabaseUrl}`);
+        // Try to access a simple table or use a basic query
+        let { data, error } = await exports.supabase
+            .from('profiles')
+            .select('*')
+            .limit(1);
+        if (error) {
+            // If profiles table doesn't exist, try transactions
+            const { data: transData, error: transError } = await exports.supabase
+                .from('transactions')
+                .select('*')
+                .limit(1);
+            if (transError) {
+                console.warn('Could not connect to profiles or transactions table');
+                console.warn('This might be normal if tables don\'t exist yet');
+                console.log('Supabase client created successfully');
+                return;
+            }
+        }
+        console.log('Database connected successfully');
+        console.log(`Connected to Supabase project: ${supabaseUrl.replace('https://', '').split('.')[0]}`);
+    }
+    catch (error) {
+        console.error('Database connection failed');
+        console.error('Error:', error.message);
+        console.log('Continuing without database connection test...');
+    }
+};
+if (process.env.NODE_ENV === 'development') {
+    // "void" to avoid unhandled promise warning in top-level await
+    void testConnection();
+}
+async function query(table, operation, params = {}) {
+    const operations = {
+        insert: async () => {
+            if (!params.data)
+                throw new Error('Missing data for insert');
+            const { data, error } = await exports.supabase.from(table).insert(params.data);
+            if (error)
+                throw new Error(error.message);
+            return data;
+        },
+        select: async () => {
+            const { data, error } = await exports.supabase.from(table).select(params.columns || '*');
+            if (error)
+                throw new Error(error.message);
+            return data;
+        },
+        update: async () => {
+            if (!params.data || !params.where || params.equals === undefined)
+                throw new Error('Missing parameters for update');
+            const { data, error } = await exports.supabase.from(table).update(params.data).eq(params.where, params.equals);
+            if (error)
+                throw new Error(error.message);
+            return data;
+        },
+        delete: async () => {
+            if (!params.where || params.equals === undefined)
+                throw new Error('Missing parameters for delete');
+            const { data, error } = await exports.supabase.from(table).delete().eq(params.where, params.equals);
+            if (error)
+                throw new Error(error.message);
+            return data;
+        }
+    };
+    if (!operations[operation]) {
+        throw new Error(`Invalid operation: ${operation}`);
+    }
+    const { data, error } = await operations[operation]();
+    if (error) {
+        console.error(`Database ${operation} error:`, error);
+        throw new Error(`DB_${operation.toUpperCase()}_ERROR`);
+    }
+    return data;
+}
+//# sourceMappingURL=database.js.map
