@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import transactionAdapter from '../adapters/transactionAdapter';
+import { budgetController } from '../controllers/budgetController';
 
 const router = express.Router();
 
@@ -16,6 +17,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
+// Legacy endpoints (keeping for backward compatibility)
 // GET /api/budget/summary
 router.get('/summary', authMiddleware, (req: Request, res: Response) => {
   const userTransactions = transactionAdapter.getUserTransactions(req.userId as string);
@@ -33,31 +35,6 @@ router.get('/summary', authMiddleware, (req: Request, res: Response) => {
       incomeCount: incomeData.incomeCount,
       expenseCount: expenseData.expenseCount,
       recentTransactions: userTransactions.slice(-5)
-    }
-  });
-});
-
-// GET /api/budget/categories
-router.get('/categories', authMiddleware, (req: Request, res: Response) => {
-  const userTransactions = transactionAdapter.getUserTransactions(req.userId as string);
-  const expenseCategories: { [key: string]: number } = {};
-  const incomeCategories: { [key: string]: number } = {};
-
-  userTransactions.forEach(transaction => {
-    if (transaction.type === 'expense') {
-      expenseCategories[transaction.category] =
-        (expenseCategories[transaction.category] || 0) + transaction.amount;
-    } else if (transaction.type === 'income') {
-      incomeCategories[transaction.category] =
-        (incomeCategories[transaction.category] || 0) + transaction.amount;
-    }
-  });
-
-  res.status(200).json({
-    success: true,
-    data: {
-      expenseCategories,
-      incomeCategories
     }
   });
 });
@@ -82,5 +59,34 @@ router.get('/monthly-progress', authMiddleware, (req: Request, res: Response) =>
     }
   });
 });
+
+// New enhanced budget analysis endpoints
+// GET /api/budget/analysis?period=month&year=2024
+router.get('/analysis', authMiddleware, budgetController.getBudgetAnalysis.bind(budgetController));
+
+// GET /api/budget/trends?period=month&months=6
+router.get('/trends', authMiddleware, budgetController.getBudgetTrends.bind(budgetController));
+
+// GET /api/budget/categories?period=month (enhanced version)
+router.get('/categories', authMiddleware, budgetController.getCategoryBreakdown.bind(budgetController));
+
+// Budget limit management endpoints
+// POST /api/budget/limits
+router.post('/limits', authMiddleware, budgetController.createBudgetLimit.bind(budgetController));
+
+// GET /api/budget/limits
+router.get('/limits', authMiddleware, budgetController.getBudgetLimits.bind(budgetController));
+
+// PUT /api/budget/limits/:id
+router.put('/limits/:id', authMiddleware, budgetController.updateBudgetLimit.bind(budgetController));
+
+// DELETE /api/budget/limits/:id
+router.delete('/limits/:id', authMiddleware, budgetController.deleteBudgetLimit.bind(budgetController));
+
+// GET /api/budget/warnings
+router.get('/warnings', authMiddleware, budgetController.getBudgetWarnings.bind(budgetController));
+
+// GET /api/budget/export?type=spending&period=month&format=csv
+router.get('/export', authMiddleware, budgetController.exportBudgetReport.bind(budgetController));
 
 export default router;
