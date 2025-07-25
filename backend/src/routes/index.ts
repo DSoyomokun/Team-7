@@ -2,11 +2,13 @@ import express, { Request, Response } from 'express';
 import authRoutes from './auth';
 import transactionRoutes from './transactions';
 import budgetRoutes from './budget';
+import accountRoutes from './accounts';
 
 const router = express.Router();
 
 // Mount routes
 router.use('/auth', authRoutes);
+router.use('/accounts', accountRoutes);
 router.use('/transactions', transactionRoutes);
 router.use('/budget', budgetRoutes);
 
