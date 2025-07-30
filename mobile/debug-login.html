@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Button Test</title>
+</head>
+<body style="background: #1a0d2e; color: white; padding: 20px; font-family: Arial;">
+    <h1>🔧 Button Debug Test</h1>
+    <p>If these buttons work, the issue is React Native Web specific:</p>
+    
+    <button onclick="testClick()" style="padding: 15px 30px; margin: 10px; background: #7c5fa0; color: white; border: none; border-radius: 8px; cursor: pointer;">
+        Test Button 1
+    </button>
+    
+    <button onclick="testClick2()" style="padding: 15px 30px; margin: 10px; background: transparent; color: #7c5fa0; border: 2px solid #7c5fa0; border-radius: 8px; cursor: pointer;">
+        Test Button 2
+    </button>
+    
+    <div id="output" style="margin-top: 20px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+        Click results will appear here...
+    </div>
+
+    <script>
+        function testClick() {
+            console.log('🚀 Test Button 1 clicked!');
+            document.getElementById('output').innerHTML += '<br>✅ Button 1 clicked at ' + new Date().toLocaleTimeString();
+        }
+        
+        function testClick2() {
+            console.log('🚀 Test Button 2 clicked!');
+            document.getElementById('output').innerHTML += '<br>✅ Button 2 clicked at ' + new Date().toLocaleTimeString();
+        }
+    </script>
+</body>
+</html>

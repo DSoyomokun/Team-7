@@ -116,7 +116,7 @@ router.get(
       successResponse(res, { transactions }, 'Transactions retrieved successfully');
     } catch (error: any) {
       errorResponse(res, error.message || 'Failed to retrieve transactions', 500);
-    }
+  }
   }
 );
 

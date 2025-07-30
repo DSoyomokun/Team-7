@@ -35,9 +35,9 @@ export const validateProfileUpdate = (req: Request, res: Response, next: NextFun
       if (!validCurrencies.includes(currency_preference)) {
         return errorResponse(res, 'Invalid currency preference', 400);
       }
-    }
-
-    next();
+  }
+  
+  next();
   } catch (error: any) {
     errorResponse(res, 'Validation failed', 400);
   }
@@ -71,9 +71,9 @@ export const validatePreferencesUpdate = (req: Request, res: Response, next: Nex
       if (!validThemes.includes(theme)) {
         return errorResponse(res, 'Invalid theme preference', 400);
       }
-    }
-
-    next();
+  }
+  
+  next();
   } catch (error: any) {
     errorResponse(res, 'Validation failed', 400);
   }
@@ -107,7 +107,7 @@ export const validateTransaction = (req: Request, res: Response, next: NextFunct
     next();
   } catch (error: any) {
     errorResponse(res, 'Validation failed', 400);
-  }
+    }
 };
 
 // Password change validation
@@ -129,9 +129,9 @@ export const validatePasswordChange = (req: Request, res: Response, next: NextFu
 
     if (newPassword.length > 128) {
       return errorResponse(res, 'New password must be less than 128 characters', 400);
-    }
+  }
 
-    next();
+  next();
   } catch (error: any) {
     errorResponse(res, 'Validation failed', 400);
   }
@@ -174,7 +174,7 @@ export const validatePagination = (req: Request, res: Response, next: NextFuncti
       const pageNum = parseInt(page as string);
       if (isNaN(pageNum) || pageNum < 1) {
         return errorResponse(res, 'Page must be a positive integer', 400);
-      }
+    }
     }
 
     if (limit !== undefined) {
@@ -205,9 +205,9 @@ export const validateSearchQuery = (req: Request, res: Response, next: NextFunct
 
     if (q.length > 100) {
       return errorResponse(res, 'Search query must be less than 100 characters', 400);
-    }
+  }
 
-    next();
+  next();
   } catch (error: any) {
     errorResponse(res, 'Validation failed', 400);
   }

@@ -27,7 +27,7 @@ interface LoginResult {
 const authAdapter = {
   signUp: async (email: string, password: string, name?: string): Promise<AuthResult> => {
     try {
-      return await AuthService.signUp(email, password, name);
+    return await AuthService.signUp(email, password, name);
     } catch (error: any) {
       console.error('AuthAdapter signUp error:', error);
       throw new Error(error.message || 'Failed to sign up');
@@ -36,7 +36,7 @@ const authAdapter = {
 
   login: async (email: string, password: string): Promise<LoginResult> => {
     try {
-      return await AuthService.login(email, password);
+    return await AuthService.login(email, password);
     } catch (error: any) {
       console.error('AuthAdapter login error:', error);
       throw new Error(error.message || 'Failed to login');
@@ -45,7 +45,7 @@ const authAdapter = {
 
   logout: async (): Promise<void> => {
     try {
-      return await AuthService.logout();
+    return await AuthService.logout();
     } catch (error: any) {
       console.error('AuthAdapter logout error:', error);
       throw new Error(error.message || 'Failed to logout');
@@ -54,7 +54,7 @@ const authAdapter = {
 
   getSession: async (): Promise<any> => {
     try {
-      return await AuthService.getSession();
+    return await AuthService.getSession();
     } catch (error: any) {
       console.error('AuthAdapter getSession error:', error);
       throw new Error(error.message || 'Failed to get session');

@@ -44,9 +44,9 @@ export const authenticateUser = async (req: Request, res: Response, next: NextFu
 
     // If JWT fails, try Supabase token verification
     try {
-      const { data, error } = await supabase.auth.getUser(token);
+    const { data, error } = await supabase.auth.getUser(token);
 
-      if (error || !data?.user) {
+    if (error || !data?.user) {
         return res.status(401).json({ 
           success: false,
           error: 'Invalid token' 

@@ -52,16 +52,16 @@ export default class AuthService {
       }
 
       // Create user with Supabase Auth
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: name || '',
-            created_at: new Date().toISOString()
-          }
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name || '',
+          created_at: new Date().toISOString()
         }
-      });
+      }
+    });
 
       if (error) {
         console.error('Supabase signup error:', error);
@@ -115,10 +115,10 @@ export default class AuthService {
       }
 
       // Authenticate with Supabase
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
 
       if (error) {
         console.error('Supabase login error:', error);
@@ -166,7 +166,7 @@ export default class AuthService {
    */
   static async logout(): Promise<void> {
     try {
-      const { error } = await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Supabase logout error:', error);
         throw new Error(error.message);
@@ -182,12 +182,12 @@ export default class AuthService {
    */
   static async getSession(): Promise<any> {
     try {
-      const { data, error } = await supabase.auth.getSession();
+    const { data, error } = await supabase.auth.getSession();
       if (error) {
         console.error('Supabase getSession error:', error);
         throw new Error(error.message);
       }
-      return data.session;
+    return data.session;
     } catch (error: any) {
       console.error('AuthService getSession error:', error);
       throw new Error(error.message || 'Failed to get session');
