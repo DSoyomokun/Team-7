@@ -16,9 +16,27 @@ const PORT = process.env.PORT || 3000;
 // Security middleware
 app.use(helmet());
 
-// CORS configuration
+// CORS configuration - Allow mobile app and web frontend
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:3000', // Web frontend
+  'http://localhost:8081', // Expo default
+  'http://localhost:19000', // Expo dev server
+  'http://localhost:19006', // Expo web
+  'exp://localhost:8081', // Expo client
+  'exp://localhost:19000', // Expo client alternative port
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 

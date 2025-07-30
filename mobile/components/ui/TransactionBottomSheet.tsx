@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     maxHeight: '90%',
     borderWidth: 1,
     borderColor: GlassTheme.colors.glass.light,
-    ...GlassTheme.shadows.glass,
+    // Removed shadow for web compatibility
   },
   handleBar: {
     width: 48,
@@ -272,9 +272,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: 'white',
     fontFamily: GlassTheme.typography.primary,
-    textShadowColor: GlassTheme.colors.primary[500],
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
+    // Removed text shadow for web compatibility
   },
   content: {
     padding: GlassTheme.spacing.lg,
@@ -330,7 +328,7 @@ const styles = StyleSheet.create({
   categoryButtonSelected: {
     backgroundColor: GlassTheme.colors.primary[500] + '33',
     borderColor: GlassTheme.colors.primary[500] + '66',
-    ...GlassTheme.shadows.subtle,
+    // Removed shadow for web compatibility
   },
   categoryEmoji: {
     fontSize: 18,
@@ -361,7 +359,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: GlassTheme.spacing.xl,
     alignItems: 'center',
     marginTop: GlassTheme.spacing.lg,
-    ...GlassTheme.shadows.glass,
+    // Removed shadow for web compatibility
   },
   submitButtonDisabled: {
     backgroundColor: GlassTheme.colors.neutral[600],

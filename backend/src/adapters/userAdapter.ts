@@ -1,5 +1,5 @@
 import UserService from '../services/user_service';
-import { User } from '../types';
+import { User, PublicUser } from '../types';
 import { UserProfile, UserPreferences } from '../models/User';
 
 const userAdapter = {
@@ -39,12 +39,12 @@ const userAdapter = {
   },
 
   // Get all users (admin only)
-  getAllUsers: async (): Promise<User[]> => {
+  getAllUsers: async (): Promise<PublicUser[]> => {
     return await UserService.getAllUsers();
   },
 
   // Search users
-  searchUsers: async (query: string): Promise<User[]> => {
+  searchUsers: async (query: string): Promise<PublicUser[]> => {
     return await UserService.searchUsers(query);
   }
 };

@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 276 100% 9%;
+    --foreground: 300 100% 95%;
+    --card: 285 35% 20%;
+    --card-foreground: 300 100% 95%;
+    --popover: 285 35% 20%;
+    --popover-foreground: 300 100% 95%;
+    --primary: 267 84% 81%;
+    --primary-foreground: 276 100% 9%;
+    --secondary: 285 35% 15%;
+    --secondary-foreground: 300 100% 95%;
+    --muted: 285 35% 15%;
+    --muted-foreground: 300 20% 65%;
+    --accent: 267 84% 81%;
+    --accent-foreground: 276 100% 9%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 285 35% 25%;
+    --input: 285 35% 15%;
+    --ring: 267 84% 81%;
+    --chart-1: 267 84% 81%;
+    --chart-2: 285 35% 60%;
+    --chart-3: 300 100% 75%;
+    --chart-4: 320 65% 70%;
+    --chart-5: 340 75% 75%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sf-pro;
+    background: linear-gradient(135deg, 
+      hsl(var(--background)) 0%, 
+      hsl(276 100% 6%) 50%, 
+      hsl(285 100% 8%) 100%);
+    min-height: 100vh;
+  }
+}
+
+/* Enhanced Glass Morphism Utilities */
+@layer utilities {
+  .glass-card {
+    background: linear-gradient(135deg, 
+      hsl(var(--card) / 0.15) 0%, 
+      hsl(var(--card) / 0.05) 100%);
+    backdrop-filter: blur(40px) saturate(200%);
+    border: 1px solid hsl(var(--foreground) / 0.1);
+    box-shadow: 
+      0 8px 32px hsl(var(--background) / 0.4),
+      0 0 0 1px hsl(var(--primary) / 0.15),
+      inset 0 1px 0 hsl(var(--foreground) / 0.15),
+      inset 0 -1px 0 hsl(var(--foreground) / 0.05);
+    position: relative;
+  }
+  
+  .glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+      hsl(var(--foreground) / 0.08) 0%, 
+      transparent 30%, 
+      transparent 70%,
+      hsl(var(--primary) / 0.05) 100%);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  
+  .glass-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, 
+      hsl(var(--foreground) / 0.1) 0%, 
+      transparent 100%);
+    border-radius: inherit;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    pointer-events: none;
+  }
+  
+  .glass-shadow {
+    box-shadow: 
+      0 8px 32px hsl(var(--background) / 0.3),
+      0 0 0 1px hsl(var(--primary) / 0.1);
+  }
+  
+  .neon-border {
+    border: 1px solid hsl(var(--primary) / 0.3);
+    box-shadow: 
+      0 0 10px hsl(var(--primary) / 0.2),
+      inset 0 0 10px hsl(var(--primary) / 0.1);
+  }
+  
+  .neon-glow {
+    box-shadow: 
+      0 0 20px hsl(var(--primary) / 0.4),
+      0 0 40px hsl(var(--primary) / 0.2),
+      inset 0 0 20px hsl(var(--primary) / 0.1);
+  }
+}

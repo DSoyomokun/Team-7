@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     height: 16,
     borderRadius: 8,
     backgroundColor: GlassTheme.colors.primary[500],
-    ...GlassTheme.shadows.subtle,
+    // Removed shadow for web compatibility
   },
   balanceContainer: {
     flex: 1,
@@ -119,9 +119,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: 'white',
     fontFamily: GlassTheme.typography.primary,
-    letterSpacing: -0.5,
-    textShadowColor: 'rgba(255, 255, 255, 0.2)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
+    // Removed letterSpacing for web compatibility
+    // Removed text shadow for web compatibility
   },
 });

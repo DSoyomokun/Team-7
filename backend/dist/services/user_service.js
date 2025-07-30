@@ -23,7 +23,7 @@ class UserService {
             throw new Error(`Unsupported currency: ${updates.currency_preference}. Supported currencies: ${User_1.SUPPORTED_CURRENCIES.join(', ')}`);
         }
         // Remove fields that shouldn't be updated directly
-        const { user_id, created_at, updated_at, email, ...profileUpdates } = updates;
+        const { user_id, created_at, updated_at, ...profileUpdates } = updates;
         const updatedProfile = await user_repository_1.UserRepository.update(userId, profileUpdates);
         // Return complete profile with auth data
         return await this.getUserProfile(userId);

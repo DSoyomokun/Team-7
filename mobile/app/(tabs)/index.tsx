@@ -1,130 +1,258 @@
-import { Image } from 'expo-image';
-import { StyleSheet, TouchableOpacity, Text } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Button } from 'react-native';
+import { supabase } from '../../src/lib/supabase';
+import { GlassTheme, glassStyles } from '../../constants/GlassTheme';
+import { AccountCard } from '../../components/ui/AccountCard';
+import { TransactionItem } from '../../components/ui/TransactionItem';
+import { GoalProgressRing } from '../../components/ui/GoalProgressRing';
+import { TransactionBottomSheet } from '../../components/ui/TransactionBottomSheet';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+// Sample data - replace with your API calls
+const accounts = [
+  {
+    accountName: "Main Checking",
+    balance: 15420.50,
+    accountType: "Checking Account"
+  },
+  {
+    accountName: "Savings Fund",
+    balance: 28750.00,
+    accountType: "Savings Account"
+  },
+  {
+    accountName: "Investment",
+    balance: 12340.75,
+    accountType: "Brokerage Account"
+  }
+];
 
-export default function HomeScreen() {
+const transactions = [
+  {
+    description: "Grocery Store",
+    amount: -85.32,
+    date: "Today",
+    category: "Food & Dining",
+    type: "expense" as const
+  },
+  {
+    description: "Salary Deposit",
+    amount: 3200.00,
+    date: "Yesterday",
+    category: "Income",
+    type: "income" as const
+  },
+  {
+    description: "Netflix Subscription",
+    amount: -15.99,
+    date: "2 days ago",
+    category: "Entertainment",
+    type: "expense" as const
+  },
+  {
+    description: "Gas Station",
+    amount: -45.20,
+    date: "3 days ago",
+    category: "Transportation",
+    type: "expense" as const
+  }
+];
+
+const goals = [
+  {
+    title: "Emergency Fund",
+    current: 8500,
+    target: 15000,
+    color: "hsl(267, 84%, 81%)"
+  },
+  {
+    title: "Vacation",
+    current: 2300,
+    target: 5000,
+    color: "hsl(285, 35%, 60%)"
+  },
+  {
+    title: "New Car",
+    current: 12000,
+    target: 25000,
+    color: "hsl(300, 100%, 75%)"
+  }
+];
+
+export default function Dashboard() {
+  const [showTransactionSheet, setShowTransactionSheet] = useState(false);
+  const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0);
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
+
+  const handleAddTransaction = (transactionData: any) => {
+    console.log('New transaction added:', transactionData);
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+    }).format(amount);
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#000000ff', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedView style={{ flex: 1 }}>
-          <ThemedText type="title" style={styles.heading}>
-            Welcome to <Text style={styles.highlight}>Team 7's</Text> FinTrack App
-          </ThemedText>
-          <ThemedText style={styles.subtitle}>
-            Simplify your money. Master your goals.
-          </ThemedText>
-        </ThemedView>
-        <HelloWave />
-      </ThemedView>
+    <View style={styles.container}>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Financial Dashboard</Text>
+          <View style={[styles.totalBalanceCard, glassStyles.card]}>
+            <Text style={styles.totalBalanceLabel}>Total Balance</Text>
+            <Text style={styles.totalBalance}>{formatCurrency(totalBalance)}</Text>
+          </View>
+        </View>
 
-      <ThemedView style={styles.authButtons}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.loginButton]}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-      </ThemedView>
+        {/* Account Cards */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Accounts</Text>
+          <View style={styles.accountGrid}>
+            {accounts.map((account, index) => (
+              <AccountCard
+                key={index}
+                accountName={account.accountName}
+                balance={account.balance}
+                accountType={account.accountType}
+              />
+            ))}
+          </View>
+        </View>
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Your Smart Finance Companion</ThemedText>
-        <ThemedText>
-          FinTrack is a full-stack budgeting app designed to help users manage their finances with ease.
-          It connects your bank accounts, digital wallets, and even your crypto portfolios into one intuitive platform.
-        </ThemedText>
-      </ThemedView>
+        {/* Goals and Transactions */}
+        <View style={styles.twoColumnSection}>
+          {/* Goals Section */}
+          <View style={styles.column}>
+            <Text style={styles.sectionTitle}>Financial Goals</Text>
+            <View style={[styles.sectionCard, glassStyles.card]}>
+              {goals.map((goal, index) => (
+                <GoalProgressRing
+                  key={index}
+                  title={goal.title}
+                  current={goal.current}
+                  target={goal.target}
+                  color={goal.color}
+                />
+              ))}
+            </View>
+          </View>
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Key Features</ThemedText>
-        <ThemedText>
-          • Automatic & manual transaction tracking{'\n'}
-          • Smart categorization (rent, groceries, etc.){'\n'}
-          • Real-time cash flow insights by day, week, or month{'\n'}
-          • Goal tracking for savings or debt payoff{'\n'}
-          • Notifications for bills, low balance, and progress
-        </ThemedText>
-      </ThemedView>
+          {/* Recent Transactions */}
+          <View style={styles.column}>
+            <Text style={styles.sectionTitle}>Recent Transactions</Text>
+            <View style={[styles.sectionCard, glassStyles.card]}>
+              {transactions.map((transaction, index) => (
+                <TransactionItem
+                  key={index}
+                  description={transaction.description}
+                  amount={transaction.amount}
+                  date={transaction.date}
+                  category={transaction.category}
+                  type={transaction.type}
+                />
+              ))}
+            </View>
+          </View>
+        </View>
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Who We Built It For</ThemedText>
-        <ThemedText>
-          From young adults building financial habits to professionals managing investments, FinTrack supports anyone looking to make informed money decisions.
-        </ThemedText>
-      </ThemedView>
-
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">What Powers Our App</ThemedText>
-        <ThemedText>
-          • Supabase (PostgreSQL) for secure data storage and auth{'\n'}
-          • React Native for a modern, cross-platform UI{'\n'}
-          • Node.js & Express for backend API and data processing{'\n'}
-          • Plaid API for safe bank account integration
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        {/* Sign Out Button */}
+        <View style={styles.signOutContainer}>
+          <Button title="Sign out" onPress={signOut} />
+        </View>
+        
+        {/* Add some bottom padding for the tab navigation */}
+        <View style={{ height: 100 }} />
+      </ScrollView>
+      
+      {/* Transaction Bottom Sheet */}
+      <TransactionBottomSheet
+        isVisible={showTransactionSheet}
+        onClose={() => setShowTransactionSheet(false)}
+        onSubmit={handleAddTransaction}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    backgroundColor: GlassTheme.colors.primary[900],
+  },
+  scrollView: {
+    flex: 1,
+  },
+  contentContainer: {
+    padding: GlassTheme.spacing.lg,
+    paddingBottom: 40,
+  },
+  header: {
     alignItems: 'center',
-    gap: 8,
-    marginTop: 12,
-    paddingHorizontal: 16,
+    marginBottom: GlassTheme.spacing.xxl,
   },
-  heading: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#004225',
+  title: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: 'white',
+    fontFamily: GlassTheme.typography.primary,
+    textAlign: 'center',
+    marginBottom: GlassTheme.spacing.lg,
   },
-  highlight: {
-    color: '#007F5F',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#444',
-    marginTop: 4,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 12,
-    paddingHorizontal: 16,
-  },
-  reactLogo: {
+  totalBalanceCard: {
+    padding: GlassTheme.spacing.lg,
+    borderRadius: GlassTheme.borderRadius.xl,
+    alignItems: 'center',
+    maxWidth: 300,
     width: '100%',
-    height: 220,
-    resizeMode: 'cover',
   },
-  authButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
-    marginVertical: 16,
+  totalBalanceLabel: {
+    fontSize: 18,
+    color: GlassTheme.colors.neutral[500],
+    fontWeight: '500',
+    marginBottom: GlassTheme.spacing.sm,
   },
-  button: {
-    backgroundColor: '#007F5F',
-    paddingVertical: 10,
-    paddingHorizontal: 24,
-    borderRadius: 8,
+  totalBalance: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: 'white',
+    fontFamily: GlassTheme.typography.primary,
   },
-  loginButton: {
-    backgroundColor: '#004225',
+  section: {
+    marginBottom: GlassTheme.spacing.xxl,
   },
-  buttonText: {
-    color: '#fff',
+  sectionTitle: {
+    fontSize: 24,
     fontWeight: '600',
-    fontSize: 16,
+    color: 'white',
+    fontFamily: GlassTheme.typography.primary,
+    marginBottom: GlassTheme.spacing.lg,
+  },
+  accountGrid: {
+    gap: GlassTheme.spacing.md,
+  },
+  twoColumnSection: {
+    gap: GlassTheme.spacing.xxl,
+    marginBottom: GlassTheme.spacing.xxl,
+  },
+  column: {
+    flex: 1,
+  },
+  sectionCard: {
+    padding: GlassTheme.spacing.lg,
+    borderRadius: GlassTheme.borderRadius.xl,
+  },
+  signOutContainer: {
+    marginTop: GlassTheme.spacing.xl,
+    alignItems: 'center',
   },
 });

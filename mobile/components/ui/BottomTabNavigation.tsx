@@ -119,11 +119,10 @@ export const BottomTabNavigation = ({
             const isPressed = pressedTab === tab.id;
             
             return (
-              <Animated.View
+              <View
                 key={tab.id}
                 style={[
-                  styles.tabItem,
-                  { transform: [{ scale: animatedValues[tab.id] }] }
+                  styles.tabItem
                 ]}
               >
                 <TouchableOpacity
@@ -168,7 +167,7 @@ export const BottomTabNavigation = ({
                     <View style={styles.activeIndicator} />
                   )}
                 </TouchableOpacity>
-              </Animated.View>
+              </View>
             );
           })}
         </View>
@@ -225,7 +224,7 @@ const styles = StyleSheet.create({
   },
   tabButtonActive: {
     backgroundColor: GlassTheme.colors.primary[500] + '33',
-    ...GlassTheme.shadows.subtle,
+    // Removed shadow for web compatibility
   },
   tabButtonPressed: {
     backgroundColor: GlassTheme.colors.neutral[600] + '50',
@@ -268,9 +267,7 @@ const styles = StyleSheet.create({
   tabLabelActive: {
     color: GlassTheme.colors.primary[500],
     fontWeight: '600',
-    textShadowColor: GlassTheme.colors.primary[500],
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 6,
+    // Removed text shadow for web compatibility
   },
   activeIndicator: {
     position: 'absolute',

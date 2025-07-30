@@ -34,12 +34,12 @@ export const GlassTheme = {
   },
   
   typography: {
-    // SF Pro Display for headings (fallback to system)
-    primary: 'SF Pro Display',
-    // SF Pro Text for body (fallback to system)
-    body: 'SF Pro Text',
-    // SF Mono for financial numbers
-    mono: 'SF Mono',
+    // Web-safe fonts with system fallbacks
+    primary: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    // Web-safe fonts for body text
+    body: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    // Web-safe monospace for financial numbers
+    mono: 'ui-monospace, SFMono-Regular, "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace',
   },
   
   spacing: {
@@ -60,18 +60,12 @@ export const GlassTheme = {
   
   shadows: {
     glass: {
-      shadowColor: 'rgba(26, 13, 46, 0.3)',
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 1,
-      shadowRadius: 32,
-      elevation: 8, // Android
+      // Simplified shadows for better web compatibility
+      elevation: 8, // Android only
     },
     subtle: {
-      shadowColor: 'rgba(26, 13, 46, 0.2)',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 1,
-      shadowRadius: 16,
-      elevation: 4, // Android
+      // Simplified shadows for better web compatibility
+      elevation: 4, // Android only
     },
   },
 };
@@ -83,7 +77,7 @@ export const glassStyles = {
     borderRadius: GlassTheme.borderRadius.lg,
     borderWidth: 1,
     borderColor: GlassTheme.colors.glass.light,
-    ...GlassTheme.shadows.glass,
+    // Removed shadow spread to avoid web compatibility issues
   },
   
   cardSubtle: {
@@ -91,6 +85,6 @@ export const glassStyles = {
     borderRadius: GlassTheme.borderRadius.md,
     borderWidth: 1,
     borderColor: 'rgba(124, 95, 160, 0.15)',
-    ...GlassTheme.shadows.subtle,
+    // Removed shadow spread to avoid web compatibility issues
   },
 };

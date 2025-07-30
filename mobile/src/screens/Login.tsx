@@ -114,7 +114,7 @@ export default function Login() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            cursor: disabled ? 'not-allowed' : 'pointer',
+            // Removed cursor property for web compatibility
             opacity: disabled ? 0.6 : 1,
             pointerEvents: disabled ? 'none' : 'auto',
           }}
@@ -257,9 +257,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'white',
     fontFamily: GlassTheme.typography.primary,
-    textShadowColor: 'rgba(255, 255, 255, 0.3)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
+    // Removed text shadow for web compatibility
   },
   subtitle: {
     fontSize: 16,
@@ -287,16 +285,15 @@ const styles = StyleSheet.create({
     marginBottom: GlassTheme.spacing.md,
     minHeight: 56,
     justifyContent: 'center',
-    cursor: 'pointer', // Web cursor
-    userSelect: 'none', // Prevent text selection
+    // Removed web-specific cursor properties for compatibility
   },
   buttonPressed: {
     opacity: 0.8,
-    transform: [{ scale: 0.98 }],
+    // Removed transform for web compatibility
   },
   primaryButton: {
     backgroundColor: GlassTheme.colors.primary[500],
-    ...GlassTheme.shadows.glass,
+    // Removed shadow for web compatibility
   },
   secondaryButton: {
     backgroundColor: 'transparent',

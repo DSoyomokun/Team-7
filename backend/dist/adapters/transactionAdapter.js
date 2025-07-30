@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const transaction_service_1 = __importDefault(require("../services/transaction_service"));
+const transaction_repository_1 = require("../repositories/transaction.repository");
 const transactionAdapter = {
     // New unified create method
     createTransaction: async (userId, transactionData) => {
@@ -51,17 +52,14 @@ const transactionAdapter = {
     detectRecurringPayments: async (userId) => {
         return await transaction_service_1.default.detectRecurringPayments(userId);
     },
-    getTransactionById: async (id) => {
-        // Note: This would need to be implemented in TransactionService
-        throw new Error('getTransactionById not yet implemented with database');
+    getTransactionById: async (id, userId) => {
+        return await transaction_repository_1.TransactionRepository.findById(id, userId);
     },
-    updateTransaction: async (id, updates) => {
-        // Note: This would need to be implemented in TransactionService
-        throw new Error('updateTransaction not yet implemented with database');
+    updateTransaction: async (id, userId, updates) => {
+        return await transaction_repository_1.TransactionRepository.update(id, userId, updates);
     },
-    deleteTransaction: async (id) => {
-        // Note: This would need to be implemented in TransactionService
-        throw new Error('deleteTransaction not yet implemented with database');
+    deleteTransaction: async (id, userId) => {
+        return await transaction_repository_1.TransactionRepository.delete(id, userId);
     }
 };
 exports.default = transactionAdapter;

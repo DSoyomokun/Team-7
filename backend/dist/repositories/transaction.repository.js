@@ -34,6 +34,52 @@ class TransactionRepository {
             return [];
         return data.map(t => new Transaction_1.Transaction(t));
     }
+    static async findById(id, userId) {
+        let query = database_1.supabase
+            .from('transactions')
+            .select('*')
+            .eq('id', id);
+        if (userId) {
+            query = query.eq('user_id', userId);
+        }
+        const { data, error } = await query.single();
+        if (error) {
+            if (error.code === 'PGRST116')
+                return null; // Not found
+            throw new Error(`Transaction query failed: ${error.message}`);
+        }
+        return data ? new Transaction_1.Transaction(data) : null;
+    }
+    static async update(id, userId, updates) {
+        // First verify the transaction exists and belongs to the user
+        const existing = await this.findById(id, userId);
+        if (!existing)
+            return null;
+        const { data, error } = await database_1.supabase
+            .from('transactions')
+            .update(updates)
+            .eq('id', id)
+            .eq('user_id', userId)
+            .select()
+            .single();
+        if (error)
+            throw new Error(`Transaction update failed: ${error.message}`);
+        return data ? new Transaction_1.Transaction(data) : null;
+    }
+    static async delete(id, userId) {
+        // First verify the transaction exists and belongs to the user
+        const existing = await this.findById(id, userId);
+        if (!existing)
+            return false;
+        const { error } = await database_1.supabase
+            .from('transactions')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', userId);
+        if (error)
+            throw new Error(`Transaction deletion failed: ${error.message}`);
+        return true;
+    }
     static async getMonthlySummary(userId, month, year) {
         const { data, error } = await database_1.supabase.rpc('get_monthly_summary', {
             user_id: userId,

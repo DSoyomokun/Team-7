@@ -3,53 +3,73 @@ import TransactionService from '../services/transaction_service';
 import { Request, Response } from 'express';
 
 const transactionController = {
-  addIncome: (req: Request, res: Response) => {
-    const { amount, category, description, date } = req.body;
-    if (!amount || amount <= 0) {
-      return res.status(400).json({ success: false, error: 'Amount must be positive' });
+  addIncome: async (req: Request, res: Response) => {
+    try {
+      const { amount, category, description, date } = req.body;
+      if (!amount || amount <= 0) {
+        return res.status(400).json({ success: false, error: 'Amount must be positive' });
+      }
+      const transactionData = {
+        userId: req.userId as string,
+        type: 'income' as const,
+        amount,
+        category,
+        description,
+        date: date || new Date()
+      };
+      const transaction = await transactionAdapter.addTransaction(transactionData);
+      res.status(201).json({ success: true, message: 'Income transaction added successfully', data: transaction });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message || 'Failed to add income' });
     }
-    const transactionData = {
-      userId: req.userId as string,
-      type: 'income' as const,
-      amount,
-      category,
-      description,
-      date: date || new Date()
-    };
-    const transaction = transactionAdapter.addTransaction(transactionData);
-    res.status(201).json({ success: true, message: 'Income transaction added successfully', data: transaction });
   },
-  addExpense: (req: Request, res: Response) => {
-    const { amount, category, description, date } = req.body;
-    if (!amount || amount <= 0) {
-      return res.status(400).json({ success: false, error: 'Amount must be greater than 0' });
+  addExpense: async (req: Request, res: Response) => {
+    try {
+      const { amount, category, description, date } = req.body;
+      if (!amount || amount <= 0) {
+        return res.status(400).json({ success: false, error: 'Amount must be greater than 0' });
+      }
+      if (!category) {
+        return res.status(400).json({ success: false, error: 'Category is required' });
+      }
+      const transactionData = {
+        userId: req.userId as string,
+        type: 'expense' as const,
+        amount,
+        category,
+        description,
+        date: date || new Date()
+      };
+      const transaction = await transactionAdapter.addTransaction(transactionData);
+      res.status(201).json({ success: true, message: 'Expense transaction added successfully', data: transaction });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message || 'Failed to add expense' });
     }
-    if (!category) {
-      return res.status(400).json({ success: false, error: 'Category is required' });
+  },
+  incomeSummary: async (req: Request, res: Response) => {
+    try {
+      const incomeData = await transactionAdapter.getUserIncome(req.userId as string);
+      res.status(200).json({ success: true, data: incomeData });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message || 'Failed to get income summary' });
     }
-    const transactionData = {
-      userId: req.userId as string,
-      type: 'expense' as const,
-      amount,
-      category,
-      description,
-      date: date || new Date()
-    };
-    const transaction = transactionAdapter.addTransaction(transactionData);
-    res.status(201).json({ success: true, message: 'Expense transaction added successfully', data: transaction });
   },
-  incomeSummary: (req: Request, res: Response) => {
-    const incomeData = transactionAdapter.getUserIncome(req.userId as string);
-    res.status(200).json({ success: true, data: incomeData });
+  expenseSummary: async (req: Request, res: Response) => {
+    try {
+      const expenseData = await transactionAdapter.getUserExpenses(req.userId as string);
+      res.status(200).json({ success: true, data: expenseData });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message || 'Failed to get expense summary' });
+    }
   },
-  expenseSummary: (req: Request, res: Response) => {
-    const expenseData = transactionAdapter.getUserExpenses(req.userId as string);
-    res.status(200).json({ success: true, data: expenseData });
-  },
-  getExpenses: (req: Request, res: Response) => {
-    const { category } = req.query;
-    const expenseData = transactionAdapter.getUserExpenses(req.userId as string, category as string | null);
-    res.status(200).json({ success: true, data: { transactions: expenseData.transactions } });
+  getExpenses: async (req: Request, res: Response) => {
+    try {
+      const { category } = req.query;
+      const expenseData = await transactionAdapter.getUserExpenses(req.userId as string, category as string | null);
+      res.status(200).json({ success: true, data: { transactions: expenseData.transactions } });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message || 'Failed to get expenses' });
+    }
   },
 
   // New methods that integrate with accounts
@@ -134,6 +154,110 @@ const transactionController = {
       res.status(500).json({
         success: false,
         error: error.message || 'Failed to fetch transactions'
+      });
+    }
+  },
+
+  getTransactionById: async (req: Request, res: Response) => {
+    try {
+      const user_id = req.user?.id;
+      const { id } = req.params;
+
+      if (!user_id) {
+        return res.status(401).json({
+          success: false,
+          error: 'User not authenticated'
+        });
+      }
+
+      const transaction = await transactionAdapter.getTransactionById(id, user_id);
+
+      if (!transaction) {
+        return res.status(404).json({
+          success: false,
+          error: 'Transaction not found'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: transaction
+      });
+    } catch (error: any) {
+      console.error('Get transaction error:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Failed to fetch transaction'
+      });
+    }
+  },
+
+  updateTransaction: async (req: Request, res: Response) => {
+    try {
+      const user_id = req.user?.id;
+      const { id } = req.params;
+      const updates = req.body;
+
+      if (!user_id) {
+        return res.status(401).json({
+          success: false,
+          error: 'User not authenticated'
+        });
+      }
+
+      const transaction = await transactionAdapter.updateTransaction(id, user_id, updates);
+
+      if (!transaction) {
+        return res.status(404).json({
+          success: false,
+          error: 'Transaction not found'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Transaction updated successfully',
+        data: transaction
+      });
+    } catch (error: any) {
+      console.error('Update transaction error:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Failed to update transaction'
+      });
+    }
+  },
+
+  deleteTransaction: async (req: Request, res: Response) => {
+    try {
+      const user_id = req.user?.id;
+      const { id } = req.params;
+
+      if (!user_id) {
+        return res.status(401).json({
+          success: false,
+          error: 'User not authenticated'
+        });
+      }
+
+      const deleted = await transactionAdapter.deleteTransaction(id, user_id);
+
+      if (!deleted) {
+        return res.status(404).json({
+          success: false,
+          error: 'Transaction not found'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Transaction deleted successfully'
+      });
+    } catch (error: any) {
+      console.error('Delete transaction error:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Failed to delete transaction'
       });
     }
   }

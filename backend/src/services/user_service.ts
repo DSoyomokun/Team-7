@@ -1,7 +1,7 @@
 import { supabase } from '../config/database';
 import { UserRepository } from '../repositories/user.repository';
 import { UserProfile, UserPreferences, SUPPORTED_CURRENCIES } from '../models/User';
-import { User } from '../types';
+import { User, PublicUser } from '../types';
 
 class UserService {
   static async getUserProfile(userId: string): Promise<UserProfile> {
@@ -26,7 +26,7 @@ class UserService {
     }
 
     // Remove fields that shouldn't be updated directly
-    const { user_id, created_at, updated_at, email, ...profileUpdates } = updates;
+    const { user_id, created_at, updated_at, ...profileUpdates } = updates;
     
     const updatedProfile = await UserRepository.update(userId, profileUpdates);
     
@@ -105,7 +105,7 @@ class UserService {
     }
   }
 
-  static async getAllUsers(): Promise<User[]> {
+  static async getAllUsers(): Promise<PublicUser[]> {
     // This should be admin-only functionality
     const { data: profiles, error } = await supabase
       .from('profile')
@@ -120,7 +120,7 @@ class UserService {
     }));
   }
 
-  static async searchUsers(query: string): Promise<User[]> {
+  static async searchUsers(query: string): Promise<PublicUser[]> {
     const { data: profiles, error } = await supabase
       .from('profile')
       .select('*')

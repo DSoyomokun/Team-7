@@ -149,4 +149,13 @@ router.get(
   }
 );
 
+// Get transaction by ID
+router.get('/:id', authenticateUser, transactionController.getTransactionById);
+
+// Update transaction
+router.put('/:id', authenticateUser, validateTransaction, transactionController.updateTransaction);
+
+// Delete transaction
+router.delete('/:id', authenticateUser, transactionController.deleteTransaction);
+
 export default router;

@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 6,
     marginRight: GlassTheme.spacing.md,
-    ...GlassTheme.shadows.subtle,
+    // Removed shadow for web compatibility
   },
   transactionInfo: {
     flex: 1,
@@ -109,8 +109,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     fontFamily: GlassTheme.typography.primary,
-    textShadowColor: 'rgba(255, 255, 255, 0.3)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
+    // Removed text shadow for web compatibility
   },
 });

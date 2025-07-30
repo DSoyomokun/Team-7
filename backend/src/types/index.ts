@@ -5,6 +5,12 @@ export interface User {
   password: string;
 }
 
+export interface PublicUser {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export interface Transaction {
   id: string;
   userId: string;

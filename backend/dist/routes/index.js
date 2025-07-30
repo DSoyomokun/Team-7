@@ -11,6 +11,7 @@ const accounts_1 = __importDefault(require("./accounts"));
 const users_1 = __importDefault(require("./users"));
 const goals_1 = __importDefault(require("./goals"));
 const dashboard_1 = __importDefault(require("./dashboard"));
+const reports_1 = __importDefault(require("./reports"));
 const router = express_1.default.Router();
 // Mount routes
 router.use('/auth', auth_1.default);
@@ -20,6 +21,7 @@ router.use('/transactions', transactions_1.default);
 router.use('/budget', budget_1.default);
 router.use('/goals', goals_1.default);
 router.use('/dashboard', dashboard_1.default);
+router.use('/reports', reports_1.default);
 // Health check endpoint
 router.get('/health', (req, res) => {
     res.json({ status: 'OK', message: 'Server is running' });

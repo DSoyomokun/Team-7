@@ -10,17 +10,39 @@ const router = express_1.default.Router();
 router.post('/signup', async (req, res) => {
     try {
         const { email, password, name } = req.body;
+        // Validate required fields
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                error: 'Email and password are required'
+            });
+        }
         const result = await authAdapter_1.default.signUp(email, password, name);
-        res.status(201).json({ message: 'User created successfully', data: result });
+        res.status(201).json({
+            success: true,
+            message: 'User created successfully',
+            data: result
+        });
     }
     catch (error) {
-        res.status(400).json({ error: error.message });
+        console.error('Signup error:', error);
+        res.status(400).json({
+            success: false,
+            error: error.message || 'Failed to create user'
+        });
     }
 });
 // Register (legacy support)
 router.post('/register', async (req, res) => {
     try {
         const { email, password, name } = req.body;
+        // Validate required fields
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                error: 'Email and password are required'
+            });
+        }
         const result = await authAdapter_1.default.signUp(email, password, name);
         res.status(201).json({
             success: true,
@@ -29,9 +51,10 @@ router.post('/register', async (req, res) => {
         });
     }
     catch (error) {
+        console.error('Register error:', error);
         res.status(400).json({
             success: false,
-            error: error.message
+            error: error.message || 'Failed to register user'
         });
     }
 });
@@ -39,17 +62,21 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
+        // Validate required fields
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                error: 'Email and password are required'
+            });
+        }
         const result = await authAdapter_1.default.login(email, password);
-        res.json({
-            success: true,
-            message: 'Login successful',
-            data: result
-        });
+        res.json(result);
     }
     catch (error) {
+        console.error('Login error:', error);
         res.status(401).json({
             success: false,
-            error: error.message
+            error: error.message || 'Login failed'
         });
     }
 });
@@ -57,20 +84,82 @@ router.post('/login', async (req, res) => {
 router.post('/logout', async (req, res) => {
     try {
         await authAdapter_1.default.logout();
-        res.json({ message: 'Logout successful' });
+        res.json({
+            success: true,
+            message: 'Logout successful'
+        });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Logout error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message || 'Logout failed'
+        });
     }
 });
 // Get session
 router.get('/session', async (req, res) => {
     try {
         const session = await authAdapter_1.default.getSession();
-        res.json({ session });
+        res.json({
+            success: true,
+            data: { session }
+        });
     }
     catch (error) {
-        res.status(401).json({ error: error.message });
+        console.error('Get session error:', error);
+        res.status(401).json({
+            success: false,
+            error: error.message || 'Failed to get session'
+        });
+    }
+});
+// Verify token
+router.post('/verify', async (req, res) => {
+    try {
+        const { token } = req.body;
+        if (!token) {
+            return res.status(400).json({
+                success: false,
+                error: 'Token is required'
+            });
+        }
+        const decoded = await authAdapter_1.default.verifyToken(token);
+        res.json({
+            success: true,
+            data: { user: decoded }
+        });
+    }
+    catch (error) {
+        console.error('Token verification error:', error);
+        res.status(401).json({
+            success: false,
+            error: error.message || 'Invalid token'
+        });
+    }
+});
+// Refresh token
+router.post('/refresh', async (req, res) => {
+    try {
+        const { refresh_token } = req.body;
+        if (!refresh_token) {
+            return res.status(400).json({
+                success: false,
+                error: 'Refresh token is required'
+            });
+        }
+        const result = await authAdapter_1.default.refreshToken(refresh_token);
+        res.json({
+            success: true,
+            data: result
+        });
+    }
+    catch (error) {
+        console.error('Token refresh error:', error);
+        res.status(401).json({
+            success: false,
+            error: error.message || 'Failed to refresh token'
+        });
     }
 });
 exports.default = router;

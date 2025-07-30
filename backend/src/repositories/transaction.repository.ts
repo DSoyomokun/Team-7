@@ -44,6 +44,58 @@ export class TransactionRepository {
     return data.map(t => new Transaction(t));
   }
 
+  static async findById(id: string, userId?: string): Promise<Transaction | null> {
+    let query = supabase
+      .from('transactions')
+      .select('*')
+      .eq('id', id);
+
+    if (userId) {
+      query = query.eq('user_id', userId);
+    }
+
+    const { data, error } = await query.single();
+
+    if (error) {
+      if (error.code === 'PGRST116') return null; // Not found
+      throw new Error(`Transaction query failed: ${error.message}`);
+    }
+    
+    return data ? new Transaction(data) : null;
+  }
+
+  static async update(id: string, userId: string, updates: Partial<TransactionProps>): Promise<Transaction | null> {
+    // First verify the transaction exists and belongs to the user
+    const existing = await this.findById(id, userId);
+    if (!existing) return null;
+
+    const { data, error } = await supabase
+      .from('transactions')
+      .update(updates)
+      .eq('id', id)
+      .eq('user_id', userId)
+      .select()
+      .single();
+
+    if (error) throw new Error(`Transaction update failed: ${error.message}`);
+    return data ? new Transaction(data) : null;
+  }
+
+  static async delete(id: string, userId: string): Promise<boolean> {
+    // First verify the transaction exists and belongs to the user
+    const existing = await this.findById(id, userId);
+    if (!existing) return false;
+
+    const { error } = await supabase
+      .from('transactions')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId);
+
+    if (error) throw new Error(`Transaction deletion failed: ${error.message}`);
+    return true;
+  }
+
   static async getMonthlySummary(userId: string | number, month: number, year: number): Promise<MonthlySummary> {
     const { data, error } = await supabase.rpc('get_monthly_summary', {
       user_id: userId,

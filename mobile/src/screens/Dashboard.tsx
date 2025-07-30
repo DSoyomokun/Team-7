@@ -222,9 +222,7 @@ const styles = StyleSheet.create({
     fontFamily: GlassTheme.typography.primary,
     textAlign: 'center',
     marginBottom: GlassTheme.spacing.lg,
-    textShadowColor: 'rgba(255, 255, 255, 0.3)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 20,
+    // Removed text shadow for web compatibility
   },
   totalBalanceCard: {
     padding: GlassTheme.spacing.lg,
@@ -244,9 +242,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: 'white',
     fontFamily: GlassTheme.typography.primary,
-    textShadowColor: 'rgba(255, 255, 255, 0.2)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 15,
+    // Removed text shadow for web compatibility
   },
   section: {
     marginBottom: GlassTheme.spacing.xxl,
@@ -257,9 +253,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontFamily: GlassTheme.typography.primary,
     marginBottom: GlassTheme.spacing.lg,
-    textShadowColor: 'rgba(255, 255, 255, 0.2)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
+    // Removed text shadow for web compatibility
   },
   accountGrid: {
     gap: GlassTheme.spacing.md,

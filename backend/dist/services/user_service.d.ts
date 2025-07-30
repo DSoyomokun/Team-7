@@ -1,5 +1,5 @@
 import { UserProfile, UserPreferences } from '../models/User';
-import { User } from '../types';
+import { PublicUser } from '../types';
 declare class UserService {
     static getUserProfile(userId: string): Promise<UserProfile>;
     static updateUserProfile(userId: string, updates: Partial<UserProfile>): Promise<UserProfile>;
@@ -8,8 +8,8 @@ declare class UserService {
     static deleteUser(userId: string): Promise<boolean>;
     static getUserStats(userId: string): Promise<any>;
     static changePassword(userId: string, currentPassword: string, newPassword: string): Promise<boolean>;
-    static getAllUsers(): Promise<User[]>;
-    static searchUsers(query: string): Promise<User[]>;
+    static getAllUsers(): Promise<PublicUser[]>;
+    static searchUsers(query: string): Promise<PublicUser[]>;
     static getProfile(userId: string): Promise<UserProfile>;
     static updateProfile(userId: string, updates: Partial<UserProfile>): Promise<UserProfile>;
     static deleteAccount(userId: string): Promise<void>;

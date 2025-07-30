@@ -140,6 +140,43 @@ class ApiService {
     return this.apiCall('/dashboard');
   }
 
+  async getTransactionById(id: string) {
+    console.log('📖 Getting transaction by ID:', id);
+    const result = await this.apiCall(`/transactions/${id}`);
+    console.log('📥 Transaction response:', result);
+    return result;
+  }
+
+  async updateTransaction(id: string, updates: {
+    amount?: number;
+    category?: string;
+    description?: string;
+    date?: Date;
+    type?: 'income' | 'expense';
+  }) {
+    console.log('✏️ Updating transaction:', id, updates);
+    
+    // Map frontend data to backend format
+    const backendData: any = {};
+    if (updates.amount !== undefined) backendData.amount = updates.amount;
+    if (updates.category !== undefined) backendData.category = updates.category;
+    if (updates.description !== undefined) backendData.description = updates.description;
+    if (updates.date !== undefined) backendData.date = updates.date.toISOString();
+    if (updates.type !== undefined) backendData.is_expense = updates.type === 'expense';
+
+    console.log('📤 Sending update to backend:', backendData);
+    const result = await this.apiCall(`/transactions/${id}`, 'PUT', backendData);
+    console.log('📥 Update response:', result);
+    return result;
+  }
+
+  async deleteTransaction(id: string) {
+    console.log('🗑️ Deleting transaction:', id);
+    const result = await this.apiCall(`/transactions/${id}`, 'DELETE');
+    console.log('📥 Delete response:', result);
+    return result;
+  }
+
   // Categories API methods
   async getCategories() {
     return this.apiCall('/categories');

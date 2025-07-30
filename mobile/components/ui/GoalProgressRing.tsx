@@ -128,10 +128,9 @@ export const GoalProgressRing = ({
   };
 
   return (
-    <Animated.View 
+    <View 
       style={[
         styles.container, 
-        { transform: [{ scale: scaleAnimation }] },
         celebrating && styles.celebrating
       ]}
     >
@@ -225,7 +224,7 @@ export const GoalProgressRing = ({
           <Text style={styles.celebrationText}>🎉 Milestone Reached! 🎉</Text>
         </View>
       )}
-    </Animated.View>
+    </View>
   );
 };
 
@@ -244,7 +243,7 @@ const styles = StyleSheet.create({
   },
   celebrating: {
     borderColor: GlassTheme.colors.primary[500] + '66',
-    ...GlassTheme.shadows.glass,
+    // Removed shadow for web compatibility
   },
   backgroundGradient: {
     position: 'absolute',
@@ -284,9 +283,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: 'white',
     fontFamily: GlassTheme.typography.mono,
-    textShadowColor: 'rgba(255, 255, 255, 0.3)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
+    // Removed text shadow for web compatibility
   },
   achievedText: {
     fontSize: 10,

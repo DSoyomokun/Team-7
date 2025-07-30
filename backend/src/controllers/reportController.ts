@@ -34,7 +34,8 @@ export default class ReportController {
       
       const totalSpent = transactions.reduce((sum, t) => sum + t.amount, 0);
       const categoryBreakdown = transactions.reduce((acc, t) => {
-        acc[t.category] = (acc[t.category] || 0) + t.amount;
+        const categoryKey = t.category_id || 'uncategorized';
+        acc[categoryKey] = (acc[categoryKey] || 0) + t.amount;
         return acc;
       }, {} as Record<string, number>);
 
@@ -79,7 +80,8 @@ export default class ReportController {
       
       const totalIncome = transactions.reduce((sum, t) => sum + t.amount, 0);
       const sourceBreakdown = transactions.reduce((acc, t) => {
-        acc[t.category] = (acc[t.category] || 0) + t.amount;
+        const categoryKey = t.category_id || 'uncategorized';
+        acc[categoryKey] = (acc[categoryKey] || 0) + t.amount;
         return acc;
       }, {} as Record<string, number>);
 

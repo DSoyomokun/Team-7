@@ -1,37 +1,39 @@
 import TransactionService from '../services/transaction_service';
-import { Transaction, CreateTransactionRequest } from '../types';
+import { TransactionRepository } from '../repositories/transaction.repository';
+import { Transaction as TransactionModel } from '../models/Transaction';
+import { CreateTransactionRequest } from '../types';
 
 interface IncomeData {
   totalIncome: number;
   incomeCount: number;
-  transactions: Transaction[];
+  transactions: TransactionModel[];
 }
 
 interface ExpenseData {
   totalExpenses: number;
   expenseCount: number;
-  transactions: Transaction[];
+  transactions: TransactionModel[];
 }
 
 const transactionAdapter = {
   // New unified create method
-  createTransaction: async (userId: string, transactionData: any): Promise<Transaction> => {
+  createTransaction: async (userId: string, transactionData: any): Promise<TransactionModel> => {
     return await TransactionService.createTransaction(userId, transactionData);
   },
 
   // Legacy method for backward compatibility
-  addTransaction: async (transaction: CreateTransactionRequest & { userId: string }): Promise<Transaction> => {
+  addTransaction: async (transaction: CreateTransactionRequest & { userId: string }): Promise<TransactionModel> => {
     const { userId, ...transactionData } = transaction;
     return await TransactionService.createTransaction(userId, transactionData);
   },
 
   // New unified get method with filters
-  getTransactions: async (userId: string, filters?: any): Promise<Transaction[]> => {
+  getTransactions: async (userId: string, filters?: any): Promise<TransactionModel[]> => {
     return await TransactionService.getTransactions(userId, filters);
   },
 
   // Legacy method for backward compatibility
-  getUserTransactions: async (userId: string, type: 'income' | 'expense' | null = null): Promise<Transaction[]> => {
+  getUserTransactions: async (userId: string, type: 'income' | 'expense' | null = null): Promise<TransactionModel[]> => {
     const filters = type ? { type } : {};
     return await TransactionService.getTransactions(userId, filters);
   },
@@ -68,19 +70,16 @@ const transactionAdapter = {
     return await TransactionService.detectRecurringPayments(userId);
   },
 
-  getTransactionById: async (id: string): Promise<Transaction | undefined> => {
-    // Note: This would need to be implemented in TransactionService
-    throw new Error('getTransactionById not yet implemented with database');
+  getTransactionById: async (id: string, userId: string): Promise<TransactionModel | null> => {
+    return await TransactionRepository.findById(id, userId);
   },
 
-  updateTransaction: async (id: string, updates: Partial<Transaction>): Promise<Transaction | null> => {
-    // Note: This would need to be implemented in TransactionService
-    throw new Error('updateTransaction not yet implemented with database');
+  updateTransaction: async (id: string, userId: string, updates: any): Promise<TransactionModel | null> => {
+    return await TransactionRepository.update(id, userId, updates);
   },
 
-  deleteTransaction: async (id: string): Promise<Transaction | null> => {
-    // Note: This would need to be implemented in TransactionService
-    throw new Error('deleteTransaction not yet implemented with database');
+  deleteTransaction: async (id: string, userId: string): Promise<boolean> => {
+    return await TransactionRepository.delete(id, userId);
   }
 };
 

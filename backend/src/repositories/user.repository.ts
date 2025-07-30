@@ -3,7 +3,7 @@ import { supabase } from '../config/database';
 interface UserData {
   user_id: string;
   email?: string;
-  full_name?: string;
+  full_name?: string | null;
   currency_preference?: string;
   created_at?: string;
   updated_at?: string;

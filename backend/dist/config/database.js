@@ -19,8 +19,8 @@ if ((!supabaseUrl || !supabaseKey) && process.env.NODE_ENV === 'test') {
 else if (!supabaseUrl || !supabaseKey) {
     console.error('Missing Supabase credentials in .env file');
     console.error('Please add:');
-    console.error('SUPABASE_URL=https://immywbjpwmdmbcuknpwb.supabase.co');
-    console.error('SUPABASE_KEY=sb_publishable_jGWo6hNjfBvJEd4ELkfSDQ_5E2xrr3Z');
+    console.error('SUPABASE_URL=your_supabase_project_url');
+    console.error('SUPABASE_KEY=your_supabase_anon_key');
     throw new Error('Missing Supabase credentials in .env file');
 }
 exports.supabase = (0, supabase_js_1.createClient)(supabaseUrl, supabaseKey);
